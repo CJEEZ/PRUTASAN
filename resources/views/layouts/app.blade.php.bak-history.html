@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Fruit2Web') }}</title>
+
+    
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    
+
+<script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .two-level-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 antialiased min-h-screen flex flex-col">
+
+    @php
+        $isAdminLayout = auth()->check() && auth()->user()->role === 'admin' && request()->is('admin*');
+    @endphp
+
+    <header class="sticky top-0 z-40 two-level-shadow bg-white">
+        @if($isAdminLayout)
+            <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between h-14">
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
+                        <img src="{{ asset('logo.svg') }}" alt="FruitWeb Logo" class="h-10 w-auto" title="FruitWeb">
+                        <span class="text-sm text-gray-600">Seller</span>
+                    </a>
+                    <div class="flex items-center space-x-5">
+                        <a href="{{ route('profile.show') }}" class="flex items-center text-gray-700 hover:text-orange-600 transition">
+                            <i class="fas fa-user-circle text-2xl mr-1"></i>
+                            <span class="hidden sm:inline text-base">Profile</span>
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="flex items-center">
+                            @csrf
+                            <button type="submit" class="flex items-center text-base text-gray-700 hover:text-red-600 transition font-semibold">
+                                <i class="fas fa-sign-out-alt text-xl mr-1"></i>
+                                <span class="hidden sm:inline">Logout</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @else
+            <!-- Top Info Bar (Full Width) -->
+            <div class="bg-orange-600 text-white text-sm py-2 hidden sm:block">
+                <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-map-marker-alt text-sm"></i>
+                        <span>Fresh from Victoria, Oriental Mindoro</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="#" class="hover:text-orange-200">Seller Center</a>
+                        <a href="#" class="hover:text-orange-200">Help</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Navigation Bar (Full Width) -->
+            <div class="bg-white">
+                <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-20 items-center">
+                        
+                        <!-- Left: Logo -->
+                        <div class="flex-shrink-0 flex flex-col justify-center h-full">
+                            <a href="{{ route('catalog.index') }}" class="flex items-center space-x-2">
+                                <img src="{{ asset('logo.svg') }}" alt="FruitWeb Logo" class="h-12 w-auto" title="FruitWeb - Fresh Fruits from Oriental Mindoro">
+                            </a>
+                            <span class="text-xs text-gray-500 mt-0.5">Oriental Mindoro</span>
+                        </div>
+
+                        
+                        <!-- Middle: Search Bar -->
+                        <div class="hidden md:flex flex-grow max-w-2xl mx-4"> 
+                            <form action="{{ route('catalog.index') }}" method="GET" class="relative w-full">
+                                <input type="search" name="search" placeholder="Search for fresh seasonal fruits..."
+                                       class="w-full py-2.5 pl-4 pr-16 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                                       value="{{ request('search') }}">
+                                <button type="submit" class="absolute right-0 top-0 h-full px-4 bg-orange-600 text-white rounded-r-lg hover:bg-orange-700 transition">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        
+                        <!-- Right: Cart/Auth Icons -->
+                        <div class="flex items-center space-x-6 flex-shrink-0">
+                            
+                            <!-- Profile Link (New) -->
+                            @auth
+                                <a href="{{ route('profile.show') }}" class="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition duration-150 font-medium group">
+                                    <i class="fas fa-user-circle text-2xl text-gray-600 group-hover:text-orange-600"></i>
+                                    <span class="text-base">Profile</span>
+                                </a>
+                            @endauth
+                            
+                            <!-- Cart Button -->
+                            <button id="open-cart-sidebar" class="relative p-2 text-gray-600 hover:text-orange-600 transition duration-150 focus:outline-none rounded-full">
+                                <i class="fas fa-shopping-cart text-2xl"></i>
+                                <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                    {{ $cartService->getTotalQuantity() }}
+                                </span>
+                            </button>
+                            
+                            <!-- Auth/Logout Button -->
+                            @auth
+                                <form method="POST" action="{{ route('logout') }}" class="hidden sm:flex items-center space-x-1">
+                                    @csrf
+                                    <button type="submit" class="text-base text-gray-700 hover:text-orange-600 transition duration-150 font-medium">
+                                        <i class="fas fa-sign-out-alt text-xl mr-1"></i>Logout
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ route('login') }}" class="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition duration-150 font-medium">
+                                    <i class="fas fa-sign-in-alt text-2xl"></i>
+                                    <span class="text-base">Login</span>
+                                </a>
+                            @endauth
+
+                            <!-- Mobile Menu Toggle -->
+                            <button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-600 hover:text-orange-600 transition duration-150 focus:outline-none rounded-md">
+                                <i class="fas fa-bars text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Link Bar (Full Width) -->
+            <div class="bg-gray-100 hidden sm:block border-t border-gray-200">
+                <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div class="flex space-x-6 text-sm font-medium text-gray-600">
+                        <a href="{{ route('catalog.index', ['search' => 'mango']) }}" class="hover:text-orange-600 transition duration-150">Mango</a>
+                        <a href="{{ route('catalog.index', ['search' => 'banana']) }}" class="hover:text-orange-600 transition duration-150">Banana</a>
+                        <a href="{{ route('catalog.index', ['search' => 'pineapple']) }}" class="hover:text-orange-600 transition duration-150">Pineapple</a>
+                        <a href="{{ route('catalog.index', ['search' => 'coconut']) }}" class="hover:text-orange-600 transition duration-150">Coconut</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 p-4">
+                <div class="space-y-3">
+                    
+                    <form action="{{ route('catalog.index') }}" method="GET" class="relative w-full">
+                        <input type="search" name="search" placeholder="Search..." 
+                               class="w-full py-2 pl-4 pr-12 border border-gray-300 rounded-lg text-sm"
+                               value="{{ request('search') }}">
+                        <button type="submit" class="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 p-2">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    
+                    <div class="flex space-x-4 text-sm font-medium text-gray-600 overflow-x-auto pb-2">
+                        <a href="{{ route('catalog.index', ['search' => 'mango']) }}" class="flex-shrink-0 hover:text-orange-600">Mango</a>
+                        <a href="{{ route('catalog.index', ['search' => 'banana']) }}" class="flex-shrink-0 hover:text-orange-600">Banana</a>
+                        <a href="{{ route('catalog.index', ['search' => 'pineapple']) }}" class="flex-shrink-0 hover:text-orange-600">Pineapple</a>
+                        <a href="{{ route('catalog.index', ['search' => 'coconut']) }}" class="flex-shrink-0 hover:text-orange-600">Coconut</a>
+                    </div>
+                    
+                    @auth
+                        <!-- Profile Link in Mobile Menu (New) -->
+                        <a href="{{ route('profile.show') }}" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                            Profile
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-red-50 hover:text-red-600">
+                                Logout ({{ Auth::user()->name }})
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-orange-50 hover:text-orange-600">Login</a>
+                        <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-orange-600 hover:bg-orange-700 mt-2 text-center">Register</a>
+                    @endauth
+                </div>
+            </div>
+        @endif
+    </header>
+
+    
+
+<main class="flex-grow">
+        @yield('content')
+    </main>
+    
+    <!-- Footer remains unchanged -->
+    <footer class="bg-gray-100 text-gray-600 mt-auto border-t border-gray-200">
+        <div class="w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-sm text-gray-500">
+                &copy; {{ date('Y') }} Fruit2Web. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    @unless($isAdminLayout)
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white z-50 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-orange-600">
+            <h2 class="text-xl font-bold text-white">Shopping Cart</h2>
+            <button id="close-cart-sidebar" class="text-white hover:text-gray-200 transition">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div id="cart-items-container" class="p-4 space-y-4 overflow-y-auto flex-grow">
+            <div class="text-center text-gray-500 py-16">
+                <i class="fas fa-shopping-cart text-5xl mb-4 text-gray-300"></i>
+                <p>Your cart is currently empty.</p>
+            </div>
+        </div>
+        <div class="p-6 border-t border-gray-200 bg-gray-50">
+            <div class="mb-4 space-y-2">
+                <div class="flex justify-between text-gray-700">
+                    <span>Subtotal:</span>
+                    <span id="cart-subtotal" class="font-semibold text-gray-800">₱0.00</span>
+                </div>
+                <div class="flex justify-between text-gray-700 pb-4 border-b border-gray-200">
+                    <span>Shipping:</span>
+                    <span id="cart-shipping" class="font-semibold text-gray-800">₱0.00</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                    <span class="text-gray-800">Total:</span>
+                    <span id="cart-total" class="text-orange-600">₱0.00</span>
+                </div>
+            </div>
+            @auth
+            <a href="{{ route('checkout.show') }}" class="block w-full text-center px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition shadow-lg mb-2">
+                Proceed to Checkout
+            </a>
+            @else
+            <a href="{{ route('login') }}" class="block w-full text-center px-4 py-3 bg-orange-400 text-white rounded-lg font-semibold transition shadow-lg mb-2">
+                Login to Proceed
+            </a>
+            @endauth
+            <a href="{{ route('cart.show') }}" class="block w-full text-center px-4 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition">
+                View Full Cart
+            </a>
+        </div>
+    </div>
+    @endunless
+
+    @unless($isAdminLayout)
+    <script>
+        // Load cart items from AJAX endpoint
+        function loadCartItems() {
+            fetch('/cart/api/items')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('cart-items-container');
+                    const subtotalEl = document.getElementById('cart-subtotal');
+                    const shippingEl = document.getElementById('cart-shipping');
+                    const totalEl = document.getElementById('cart-total');
+                    const cartCount = document.getElementById('cart-count');
+                    const shipping = data.items.length > 0 ? 50 : 0;
+                    
+                    if (data.items.length === 0) {
+                        container.innerHTML = '<div class="text-center text-gray-500 py-16"><i class="fas fa-shopping-cart text-5xl mb-4 text-gray-300"></i><p>Your cart is currently empty.</p></div>';
+                        subtotalEl.textContent = '₱0.00';
+                        shippingEl.textContent = '₱0.00';
+                        totalEl.textContent = '₱0.00';
+                        cartCount.textContent = '0';
+                        return;
+                    }
+
+                    // Build cart items HTML
+                    let html = '';
+                    data.items.forEach(item => {
+                        html += `
+                            <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-orange-300 transition">
+                                <img src="${item.image_url}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                                <div class="flex-grow">
+                                    <h4 class="font-semibold text-sm text-gray-800">${item.name}</h4>
+                                    <p class="text-xs text-gray-500">₱${parseFloat(item.price).toFixed(2)} / ${item.unit}</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <div class="flex items-center border border-gray-300 rounded">
+                                            <button onclick="updateQty(${item.id}, ${item.quantity - 1})" class="px-2 py-1 text-gray-600 hover:bg-gray-200 font-bold">−</button>
+                                            <span class="px-3 py-1 text-sm font-semibold">${item.quantity}</span>
+                                            <button onclick="updateQty(${item.id}, ${item.quantity + 1})" class="px-2 py-1 text-gray-600 hover:bg-gray-200 font-bold">+</button>
+                                        </div>
+                                        <button onclick="removeItem(${item.id})" class="ml-auto text-red-500 hover:text-red-700 font-bold">✕</button>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold text-orange-600">₱${parseFloat(item.subtotal).toFixed(2)}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = html;
+                    subtotalEl.textContent = '₱' + parseFloat(data.total).toFixed(2);
+                    shippingEl.textContent = '₱' + shipping.toFixed(2);
+                    totalEl.textContent = '₱' + (parseFloat(data.total) + shipping).toFixed(2);
+                    cartCount.textContent = data.count;
+                })
+                .catch(error => console.error('Error loading cart items:', error));
+        }
+
+        function updateQty(productId, quantity) {
+            if (quantity < 1) {
+                removeItem(productId);
+                return;
+            }
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/update/${productId}`;
+            form.innerHTML = `
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="quantity" value="${quantity}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function removeItem(productId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/remove/${productId}`;
+            form.innerHTML = `
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('cart-sidebar');
+            const openButton = document.getElementById('open-cart-sidebar');
+            const closeButton = document.getElementById('close-cart-sidebar');
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // Load cart items when sidebar opens
+            openButton.addEventListener('click', () => {
+                loadCartItems();
+                sidebar.classList.remove('translate-x-full');
+            });
+
+            closeButton.addEventListener('click', () => {
+                sidebar.classList.add('translate-x-full');
+            });
+            
+            // Mobile Menu Toggle
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Reload cart after adding item
+            document.querySelectorAll('form[action*="/cart/add/"]').forEach(form => {
+                form.addEventListener('submit', () => {
+                    setTimeout(loadCartItems, 300);
+                });
+            });
+            
+            // Close sidebar when navigating to checkout
+            document.querySelectorAll('a[href="{{ route('checkout.show') }}"], a[href="{{ route('login') }}"]').forEach(link => {
+                link.addEventListener('click', () => {
+                    sidebar.classList.add('translate-x-full');
+                });
+            });
+            
+            // Initial load
+            loadCartItems();
+        });
+    </script>
+    @endunless
+</body>
+</html>

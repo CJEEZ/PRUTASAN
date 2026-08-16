@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Seller Signup - Fruit2Web</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 antialiased">
+    <div class="min-h-screen flex flex-col items-center justify-center p-4" style="background: linear-gradient(to bottom right, #fff4e0, #ffedd5);">
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
+                    <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain mx-auto block">
+                </div>
+                <p class="text-gray-600 mt-1">Create your seller account</p>
+            </div>
+
+        <div class="w-full max-w-sm bg-white p-8 rounded-xl shadow-2xl transition duration-500 hover:shadow-2xl">
+            @if(session('signup_success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
+                    {{ session('signup_success') }}
+                </div>
+            @endif
+
+            <h2 class="text-xl font-semibold text-gray-800 mb-1">Seller Signup</h2>
+            <p class="text-sm text-gray-500 mb-6">Create an account to start selling fresh fruits</p>
+
+            <form method="POST" action="{{ route('seller.register.store') }}">
+                @csrf
+
+                <!-- Full Name -->
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                           placeholder="Juan Dela Cruz"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-orange-500 focus:ring-0">
+                    @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                           placeholder="juan@example.com"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-orange-500 focus:ring-0">
+                    @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <!-- Phone Number -->
+                <div class="mb-4">
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input id="phone_number" type="text" name="phone_number" value="{{ old('phone_number') }}" required
+                           placeholder="09XXXXXXXXX"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-orange-500 focus:ring-0">
+                    @error('phone_number')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input id="password" type="password" name="password" required autocomplete="new-password"
+                           placeholder="••••••••"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-orange-500 focus:ring-0">
+                    @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required
+                           placeholder="••••••••"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-orange-500 focus:ring-0">
+                </div>
+
+                <!-- Terms -->
+                <div class="mb-6 flex items-start gap-2">
+                    <input id="agree_terms" type="checkbox" name="agree_terms" value="1" class="mt-1">
+                    <label for="agree_terms" class="text-sm text-gray-600">I agree to the <a href="#" class="text-orange-600">seller terms</a></label>
+                </div>
+                @error('agree_terms')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+
+                <button type="submit" class="w-full py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-150 shadow-md">
+                    Create Seller Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm">
+                <p class="text-gray-500">Already have an account? <a href="{{ route('login') }}" class="text-orange-600 font-semibold hover:text-orange-700 transition">Login</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

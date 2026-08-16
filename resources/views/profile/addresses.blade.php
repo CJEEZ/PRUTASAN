@@ -1,0 +1,62 @@
+<!-- Addresses Section -->
+<div id="addresses" class="mt-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-bold text-gray-800">Addresses</h3>
+            <p class="text-sm text-gray-600 mt-1">Manage your shipping and billing addresses</p>
+        </div>
+
+        <div class="p-6">
+            <!-- Addresses List -->
+            <div class="space-y-4">
+                @forelse($user->addresses ?? [] as $address)
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <h4 class="font-semibold text-gray-800">{{ $address->label ?? 'Address' }}</h4>
+                                    @if($address->is_default)
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                            Default
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-gray-700 mb-1">{{ $address->street_address }}</p>
+                                <p class="text-gray-600 text-sm">{{ $address->city }}, {{ $address->province }} {{ $address->postal_code }}</p>
+                                <p class="text-gray-600 text-sm">{{ $address->country }}</p>
+                                @if($address->phone)
+                                    <p class="text-gray-600 text-sm mt-1">Phone: {{ $address->phone }}</p>
+                                @endif
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center space-x-2 ml-4">
+                                @if(!$address->is_default)
+                                    <button onclick="setAsDefaultAddress({{ $address->id }})" class="px-3 py-1 text-sm text-orange-600 hover:text-orange-800 font-medium">
+                                        Set Default
+                                    </button>
+                                @endif
+                                <button onclick="editAddress({{ $address->id }})" class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                    Edit
+                                </button>
+                                <button onclick="deleteAddress({{ $address->id }})" class="px-3 py-1 text-sm text-red-600 hover:text-red-800 font-medium">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-12">
+                        <i class="fas fa-map-marker-alt text-5xl text-gray-300 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">No addresses yet</h3>
+                        <p class="text-gray-600 mb-4">Add your shipping address to make checkout faster.</p>
+                        <button onclick="showAddAddressModal()" class="inline-flex items-center px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Address
+                        </button>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>

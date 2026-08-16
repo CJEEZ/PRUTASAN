@@ -1,0 +1,126 @@
+<!-- Notifications Section in Profile Show -->
+<div id="notifications" class="hidden mt-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <!-- Header with Mark All as Read -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-bold text-gray-800">Notifications</h3>
+            @if($notifications->where('is_read', false)->count() > 0)
+                <button onclick="markAllAsRead()" class="text-orange-600 text-sm font-medium hover:text-orange-700">
+                    Mark all as read
+                </button>
+            @endif
+        </div>
+
+        <!-- Notification Categories -->
+        <div class="border-b border-gray-200">
+            <div class="flex overflow-x-auto bg-white">
+                <button onclick="filterNotifications('all')" class="notification-filter flex-shrink-0 px-6 py-4 font-medium border-b-2 border-orange-600 text-orange-600 hover:text-orange-700 whitespace-nowrap" data-type="all">
+                    All
+                </button>
+                <button onclick="filterNotifications('order_update')" class="notification-filter flex-shrink-0 px-6 py-4 font-medium border-b-2 border-transparent text-gray-700 hover:text-orange-600 hover:border-orange-300 whitespace-nowrap" data-type="order_update">
+                    Order Updates
+                </button>
+                <button onclick="filterNotifications('promotion')" class="notification-filter flex-shrink-0 px-6 py-4 font-medium border-b-2 border-transparent text-gray-700 hover:text-orange-600 hover:border-orange-300 whitespace-nowrap" data-type="promotion">
+                    Promotions
+                </button>
+                <button onclick="filterNotifications('wallet_update')" class="notification-filter flex-shrink-0 px-6 py-4 font-medium border-b-2 border-transparent text-gray-700 hover:text-orange-600 hover:border-orange-300 whitespace-nowrap" data-type="wallet_update">
+                    Wallet Updates
+                </button>
+                <button onclick="filterNotifications('system_update')" class="notification-filter flex-shrink-0 px-6 py-4 font-medium border-b-2 border-transparent text-gray-700 hover:text-orange-600 hover:border-orange-300 whitespace-nowrap" data-type="system_update">
+                    System Updates
+                </button>
+            </div>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="divide-y divide-gray-200">
+            @if($notifications->isEmpty())
+                <div class="p-12 text-center">
+                    <i class="fas fa-bell-slash text-5xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">No notifications yet</p>
+                </div>
+            @else
+                @foreach($notifications as $notification)
+                    <div class="notification-item p-4 hover:bg-gray-50 transition cursor-pointer border-l-4 @if(!$notification->is_read) border-orange-600 bg-orange-50 @else border-transparent @endif" data-type="{{ $notification->type }}" onclick="markNotificationAsRead({{ $notification->id }})">
+                        <div class="flex items-start gap-4">
+                            <!-- Notification Image -->
+                            @if($notification->image_url)
+                                <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
+                                    <img src="{{ $notification->image_url }}" alt="{{ $notification->title }}" class="w-full h-full object-cover">
+                                </div>
+                            @else
+                                <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-bell text-2xl text-gray-400"></i>
+                                </div>
+                            @endif
+
+                            <!-- Notification Content -->
+                            <div class="flex-grow">
+                                <div class="flex items-start justify-between mb-1">
+                                    <h4 class="font-semibold text-gray-800">{{ $notification->title }}</h4>
+                                    @if(!$notification->is_read)
+                                        <span class="inline-block w-2 h-2 rounded-full bg-orange-600"></span>
+                                    @endif
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">{{ $notification->message }}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</span>
+                                    <a href="#" class="text-orange-600 text-sm font-medium hover:text-orange-700">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
+</div>
+
+<script>
+function filterNotifications(type) {
+    // Update active filter button
+    document.querySelectorAll('.notification-filter').forEach(btn => {
+        btn.classList.remove('border-orange-600', 'text-orange-600', 'bg-orange-50');
+        btn.classList.add('border-transparent', 'text-gray-700');
+    });
+    document.querySelector(`.notification-filter[data-type="${type}"]`).classList.add('border-orange-600', 'text-orange-600');
+
+    // Filter notifications
+    document.querySelectorAll('.notification-item').forEach(item => {
+        const itemType = item.getAttribute('data-type');
+        if (type === 'all' || itemType === type) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function markNotificationAsRead(notificationId) {
+    fetch(`/notifications/${notificationId}/read`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        }
+    });
+}
+
+function markAllAsRead() {
+    fetch('/notifications/mark-all-as-read', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        }
+    });
+}
+</script>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Choose Your Role - Fruit2Web</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 antialiased">
+    <!-- Custom background -->
+    <div class="min-h-screen flex flex-col items-center justify-center p-4" style="background: linear-gradient(to bottom right, #fff4e0, #ffedd5);">
+
+        <div class="text-center mb-12">
+            <div class="flex justify-center mb-4">
+                
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome to Fruit2Web!</h1>
+            <p class="text-gray-600">Choose how you'd like to use your account</p>
+        </div>
+
+        <div class="w-full max-w-2xl">
+            <form method="POST" action="{{ route('auth.choose-role.store') }}">
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Customer Option -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" name="role" value="customer" class="hidden peer" required>
+                        <div class="p-8 bg-white rounded-xl shadow-lg border-2 border-gray-200 peer-checked:border-orange-600 peer-checked:ring-2 peer-checked:ring-orange-300 transition-all duration-200 hover:border-orange-400 hover:shadow-xl">
+                            <div class="flex justify-center mb-4">
+                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-shopping-bag text-blue-600 text-2xl"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-xl font-semibold text-gray-800 text-center mb-2">Customer</h2>
+                            <p class="text-gray-600 text-center text-sm">
+                                Shop for fresh fruits and vegetables. Browse our catalog, manage orders, and track your purchases.
+                            </p>
+                            <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-600 mr-2"></i>
+                                    Browse products
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-600 mr-2"></i>
+                                    Add to cart & checkout
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-600 mr-2"></i>
+                                    Track orders
+                                </li>
+                            </ul>
+                        </div>
+                    </label>
+
+                    <!-- Seller Option -->
+                    <label class="relative cursor-pointer">
+                        <input type="radio" name="role" value="seller" class="hidden peer" required>
+                        <div class="p-8 bg-white rounded-xl shadow-lg border-2 border-gray-200 peer-checked:border-orange-600 peer-checked:ring-2 peer-checked:ring-orange-300 transition-all duration-200 hover:border-orange-400 hover:shadow-xl">
+                            <div class="flex justify-center mb-4">
+                                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-store text-green-600 text-2xl"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-xl font-semibold text-gray-800 text-center mb-2">Seller</h2>
+                            <p class="text-gray-600 text-center text-sm">
+                                Sell fresh fruits and vegetables. Manage listings, track inventory, and view your sales.
+                            </p>
+                            <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-600 mr-2"></i>
+                                    Create product listings
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-600 mr-2"></i>
+                                    Manage inventory
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-600 mr-2"></i>
+                                    Track sales & revenue
+                                </li>
+                            </ul>
+                            <div class="mt-4 p-2 bg-orange-50 rounded border border-orange-200 text-xs text-orange-700">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Requires admin approval before listing products
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-8 text-center">
+                    <button type="submit" class="px-12 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-150 shadow-md">
+                        Continue
+                    </button>
+                </div>
+
+                <!-- Error Messages -->
+                @if ($errors->has('role'))
+                    <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-sm text-red-700">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            {{ $errors->first('role') }}
+                        </p>
+                    </div>
+                @endif
+            </form>
+
+            <div class="mt-6 text-center">
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="text-sm text-gray-600 hover:text-gray-800 transition">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        Use different account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

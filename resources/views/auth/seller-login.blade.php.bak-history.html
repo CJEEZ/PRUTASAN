@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>FruitWeb Seller Centre - Log In</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Header -->
+    <div class="border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <a href="{{ route('catalog.index') }}" class="flex items-center space-x-2">
+                <img src="{{ asset('logo.svg') }}" alt="FruitWeb Logo" class="h-10 w-auto">
+                <span class="text-xl font-bold text-orange-600">FruitWeb</span>
+                <span class="text-gray-400 text-sm ml-2">Seller Centre</span>
+            </a>
+            <a href="#" class="text-orange-600 text-sm font-medium hover:text-orange-700">Need help?</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex">
+        <!-- Left Section: Benefits & Illustration -->
+        <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-50 via-orange-50 to-orange-100 flex-col justify-center items-center px-8 lg:px-12 py-12">
+            <div class="text-center max-w-md">
+                <p class="text-orange-600 font-semibold text-sm mb-3 uppercase">FruitWeb Marketplace</p>
+                <h1 class="text-4xl font-bold text-orange-600 mb-4 leading-tight">Be a Power Seller</h1>
+                <p class="text-gray-700 text-lg mb-12 leading-relaxed">Manage your shop efficiently on FruitWeb with our Seller Centre</p>
+                
+                <!-- Shop Illustration Placeholder -->
+                <div class="mb-8">
+                    <svg class="w-full h-64" viewBox="0 0 200 180" fill="none">
+                        <!-- Truck -->
+                        <rect x="20" y="90" width="80" height="40" fill="#FF6B35" rx="4"/>
+                        <circle cx="40" cy="135" r="8" fill="#333"/>
+                        <circle cx="85" cy="135" r="8" fill="#333"/>
+                        
+                        <!-- Shop -->
+                        <rect x="110" y="60" width="70" height="70" fill="#FFA500" rx="4"/>
+                        <polygon points="110,60 145,20 180,60" fill="#FF8C00"/>
+                        <rect x="120" y="75" width="15" height="20" fill="#4A90E2"/>
+                        <rect x="155" y="75" width="15" height="20" fill="#4A90E2"/>
+                        <rect x="137" y="110" width="16" height="20" fill="#8B4513"/>
+                        
+                        <!-- Items on truck -->
+                        <rect x="35" y="75" width="12" height="15" fill="#FF6347" rx="2"/>
+                        <rect x="55" y="75" width="12" height="15" fill="#FFD700" rx="2"/>
+                        <rect x="75" y="75" width="12" height="15" fill="#32CD32" rx="2"/>
+                    </svg>
+                </div>
+
+                <!-- Features -->
+                <div class="text-left space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="text-orange-600 text-lg">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <p class="text-gray-700 font-medium">Leading e-commerce platform in Southeast Asia</p>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="text-orange-600 text-lg">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <p class="text-gray-700 font-medium">Growing global presence</p>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="text-orange-600 text-lg">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <p class="text-gray-700 font-medium">#1 shopping app in Philippines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section: Login Form -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+            <div class="w-full max-w-sm">
+                <!-- Form Header -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Log In</h2>
+                    
+                    <!-- QR Code Button -->
+                    <button type="button" class="w-full py-3 border-2 border-orange-400 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition mb-6 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm6-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v1h-3v-1zm1 3h1v2h-1v-2zm2-2h2v1h-2v-1zm-1-1h1v1h-1v-1zm2 3h1v1h-1v-1z"/>
+                        </svg>
+                        <span>Log in with QR</span>
+                    </button>
+                </div>
+
+                <!-- Login Form -->
+                <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    @csrf
+                    
+                    @if ($errors->any())
+                        <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                            <ul class="list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <!-- Email/Phone/Username -->
+                    <div>
+                        <input type="email" name="email" placeholder="Phone number / Username / Email" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                               value="{{ old('email') }}">
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <input type="password" name="password" placeholder="Password" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition duration-200">
+                        LOG IN
+                    </button>
+
+                    <!-- Forgot Password -->
+                    <div class="text-center">
+                        <a href="#" class="text-orange-600 text-sm font-medium hover:text-orange-700">Forgot Password?</a>
+                    </div>
+                </form>
+
+                <!-- Divider -->
+                <div class="flex items-center my-6">
+                    <div class="flex-1 border-t border-gray-300"></div>
+                    <span class="px-3 text-gray-500 text-sm">OR</span>
+                    <div class="flex-1 border-t border-gray-300"></div>
+                </div>
+
+                <!-- Social Login -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <a href="{{ url('auth/facebook?role=seller') }}" class="flex items-center justify-center py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700">
+                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="#1877F2">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Facebook
+                    </a>
+                    <a href="{{ url('auth/google?role=seller') }}" class="flex items-center justify-center py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700">
+                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google
+                    </a>
+                </div>
+
+                <!-- Sign Up Link -->
+                <div class="text-center mb-4">
+                    <span class="text-gray-600 text-sm">New to FruitWeb? <a href="{{ route('seller.register') }}" class="text-orange-600 font-semibold hover:text-orange-700">Sign Up</a></span>
+                </div>
+
+                <!-- Main Account Login -->
+                <div class="text-center pt-4 border-t border-gray-200">
+                    <a href="{{ route('login') }}" class="text-gray-700 text-sm font-medium hover:text-orange-600 flex items-center justify-center space-x-1">
+                        <span>Log in with Main Account</span>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: prutexpres
+    runtime: php
+    plan: free
+    buildCommand: composer install && php artisan migrate --force
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_NAME
+        value: PRUTEXPRES
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: prutexpres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: prutexpres-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: prutexpres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: prutexpres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: prutexpres-db
+          property: password
+
+databases:
+  - name: prutexpres-db
+    plan: free
+    databaseName: prutexpres

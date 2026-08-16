@@ -1,0 +1,97 @@
+<!--
+    This file typically handles the main navigation bar, which needs to know
+    whether a user is authenticated to show the correct links (Login/Register vs. Profile/Logout).
+-->
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow-md sticky top-0 z-50">
+
+    <!-- Primary Navigation Menu -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <!-- Logo/Application Name -->
+                <div class="shrink-0 flex items-center">
+                    <a href="{{ route('catalog.index') }}" class="flex items-center text-lg font-bold text-green-700 hover:text-green-900 transition duration-150">
+                        <!-- Replace with your actual logo image or name -->
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Fruit2Web
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.index')">
+                        {{ __('Shop') }}
+                    </x-nav-link>
+                    <!-- Cart Link is visible to all -->
+                    <x-nav-link :href="route('cart.show')" :active="request()->routeIs('cart.show')">
+                        {{ __('Cart') }}
+                    </x-nav-link>
+                    
+                    <!-- Admin Link (Only visible if the user is authenticated AND has the 'admin' role) -->
+                    @if (Auth::check() && Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            {{ __('Seller Dashboard') }}
+                        </x-nav-link>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Settings Dropdown / Auth Links -->
+            <div class="hidden sm:flex sm:items-center sm:ml-6">
+                @auth
+                    <!-- Authenticated User Dropdown -->
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                <div>{{ Auth::user()->name }}</div>
+
+                                <div class="ml-1">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <!-- Profile Link -->
+                            <x-dropdown-link :href="route('profile.show')">
+                                {{ __('My Profile') }}
+                            </x-dropdown-link>
+
+                            <!-- Checkout Link (Easy Access) -->
+                            <x-dropdown-link :href="route('checkout.show')">
+                                {{ __('Checkout') }}
+                            </x-dropdown-link>
+
+                            <!-- Logout -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+
+                                <x-dropdown-link :href="route('logout')"
+                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                @else
+                    <!-- Guest Links (Login/Register) -->
+                    <a href="{{ route('login') }}" class="text-sm text-gray-700 underline hover:text-green-600 transition duration-150">Log in</a>
+
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline hover:text-green-600 transition duration-150">Register</a>
+                    @endif
+                @endauth
+            </div>
+            
+            <!-- Mobile Menu Button (Hamburger) -->
+            <!-- ... (The standard mobile toggle button logic should remain here) ... -->
+        </div>
+    </div>
+    
+    <!-- Responsive Navigation Menu -->
+    <!-- ... (Standard responsive menu logic) ... -->
+
+</nav>

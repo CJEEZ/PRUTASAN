@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register - Fruit2Web</title>
+    
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+<script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        :root{ --primary:#065f46; --primary-2:#16a34a; --muted:#bbf7d0; --muted-2:#dcfce7; }
+        .bg-green-600{ background-color:var(--primary)!important }
+        .bg-green-700{ background-color:var(--primary-2)!important }
+        .text-green-600{ color:var(--primary)!important }
+        .text-green-700{ color:var(--primary-2)!important }
+        .focus\:border-green-600:focus{ border-color:var(--primary)!important }
+    </style>
+</head>
+<body class="bg-gray-50 antialiased">
+    <!-- Custom background for login/signup pages -->
+    <div class="min-h-screen flex flex-col items-center justify-center p-4" style="background: linear-gradient(to bottom right, var(--muted-2), var(--muted));">
+
+        <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
+                <img src="{{ asset('logo.png') }}" alt="FruitWeb Logo" class="h-28 md:h-40 lg:h-48 w-auto">
+            </div>
+            <p class="text-gray-600 mt-1">Create your account</p>
+        </div>
+
+        <div class="w-full max-w-sm bg-white p-8 rounded-xl shadow-2xl transition duration-500 hover:shadow-2xl">
+
+            
+            <!-- User Signup Form (Default) -->
+            <div id="user-signup-form" data-role="user">
+                <h2 class="text-xl font-semibold text-gray-800 mb-1">User Signup</h2>
+                <p class="text-sm text-gray-500 mb-6">Create an account to start shopping for fresh fruits</p>
+                
+                <!-- Dummy form for structure, replace with your actual form implementation -->
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+                    @php $isSellerIntent = request()->query('seller') ? true : false; @endphp
+                    <input type="hidden" name="role" value="{{ $isSellerIntent ? 'seller' : 'customer' }}">
+                    @if($isSellerIntent)
+                        <input type="hidden" name="seller" value="1">
+                    @endif
+
+                    <!-- Full Name -->
+                    <div class="mb-4">
+                        <label for="user_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input id="user_name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                               placeholder="Juan Dela Cruz"
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-green-600 focus:ring-0">
+                        <!-- Error handling would go here -->
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="user_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input id="user_email" type="email" name="email" value="{{ old('email') }}" required
+                               placeholder="juan@example.com"
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-green-600 focus:ring-0">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <label for="user_password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input id="user_password" type="password" name="password" required autocomplete="new-password"
+                               placeholder="••••••••"
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-green-600 focus:ring-0">
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-6">
+                        <label for="user_password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input id="user_password_confirmation" type="password" name="password_confirmation" required
+                               placeholder="••••••••"
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm transition duration-150 focus:border-orange-500 focus:ring-0">
+                    </div>
+
+                    <!-- Sign Up Button -->
+                    <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
+                        Sign Up
+                    </button>
+                </form>
+            </div>
+
+
+            <div class="mt-6 text-center text-sm">
+                <p class="text-gray-500">
+                    Already have an account? 
+                    <a href="{{ route('login') }}" class="text-green-600 font-semibold hover:text-green-700 transition">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleContainer = document.getElementById('role-toggle-container');
+            const userButton = toggleContainer.querySelector('[data-role="user"]');
+            const adminButton = toggleContainer.querySelector('[data-role="admin"]');
+            const userForm = document.getElementById('user-signup-form');
+            const adminForm = document.getElementById('admin-signup-form');
+
+            const switchRole = (role) => {
+                if (role === 'admin') {
+                    // Style the buttons
+                    adminButton.classList.add('bg-white', 'text-gray-800', 'shadow-md');
+                    adminButton.classList.remove('text-gray-500', 'hover:bg-gray-200');
+                    userButton.classList.remove('bg-white', 'text-gray-800', 'shadow-md');
+                    userButton.classList.add('text-gray-500', 'hover:bg-gray-200');
+
+                    // Toggle the forms
+                    userForm.classList.add('hidden');
+                    adminForm.classList.remove('hidden');
+                } else {
+                    // Style the buttons
+                    userButton.classList.add('bg-white', 'text-gray-800', 'shadow-md');
+                    userButton.classList.remove('text-gray-500', 'hover:bg-gray-200');
+                    adminButton.classList.remove('bg-white', 'text-gray-800', 'shadow-md');
+                    adminButton.classList.add('text-gray-500', 'hover:bg-gray-200');
+
+                    // Toggle the forms
+                    adminForm.classList.add('hidden');
+                    userForm.classList.remove('hidden');
+                }
+            };
+
+            userButton.addEventListener('click', () => switchRole('user'));
+            adminButton.addEventListener('click', () => switchRole('admin'));
+
+            // Initialize based on the current role (if any) or default to user
+            const initialRole = document.querySelector('input[name="role"][value="admin"]') ? 'admin' : 'user';
+            switchRole(initialRole);
+        });
+    </script>
+</body>
+</html>

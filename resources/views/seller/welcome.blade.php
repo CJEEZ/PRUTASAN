@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Fruit2Web - Start Selling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 antialiased">
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-5xl bg-white rounded-lg shadow-md p-12">
+            <div class="flex flex-col items-center">
+                
+                <h1 class="text-2xl font-semibold text-gray-800 mb-2">Welcome to Fruit2Web</h1>
+                <p class="text-gray-600 mb-6">To get started, register as a seller by providing the necessary information.</p>
+                @auth
+                    @php $user = Auth::user(); @endphp
+                    @if($user->role !== 'seller' && $user->role !== 'admin')
+                        <a href="{{ route('seller.onboarding') }}" class="inline-block px-6 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition">Start Registration</a>
+                    @elseif($user->role === 'seller')
+                        <a href="{{ route('seller.start') }}" class="inline-block px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition">Go to Seller Dashboard</a>
+                    @else
+                        <a href="{{ route('seller.onboarding') }}" class="inline-block px-6 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition">Start Registration</a>
+                    @endif
+                @else
+                    <a href="{{ route('register', ['seller' => 1]) }}" class="inline-block px-6 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition">Start Registration</a>
+                @endauth
+            </div>
+        </div>
+    </div>
+</body>
+</html>
