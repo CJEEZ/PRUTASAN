@@ -3,7 +3,7 @@ services:
     name: prutexpres
     runtime: php
     plan: free
-    buildCommand: npm install --legacy-peer-deps && composer install && php artisan migrate --force
+    buildCommand: composer install && php artisan migrate --force
     startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
     envVars:
       - key: APP_NAME
