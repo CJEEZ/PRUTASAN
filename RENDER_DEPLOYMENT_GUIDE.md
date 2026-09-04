@@ -28,9 +28,8 @@ git commit -m "Initial commit for Render deployment"
 4. Connect your GitHub account and select your PRUTEXPRES repository
 5. Configure deployment:
    - **Name**: `prutexpres` (or your preferred name)
-   - **Runtime**: PHP
-  - **Build Command**: `composer install --no-interaction --prefer-dist --optimize-autoloader && npm ci && npm run build && php artisan migrate --force && php artisan storage:link --force`
-   - **Start Command**: `php artisan serve --host=0.0.0.0 --port=$PORT`
+  - **Runtime**: Docker
+  - **Dockerfile**: `./Dockerfile`
 
 ### 4. Set Environment Variables
 In Render dashboard, add these environment variables:
@@ -59,11 +58,10 @@ In Render dashboard, add these environment variables:
 - Click "**Create Web Service**"
 - Render will automatically:
   - Clone your repository
-  - Install PHP and Node dependencies
-  - Build frontend assets
-  - Run migrations
-  - Create the public storage link
-  - Start your app
+  - Build the Docker image with PHP, Composer, Node, and frontend assets
+  - Run migrations when the container starts
+  - Create the public storage link when the container starts
+  - Start Apache with Laravel's `public` directory as the document root
 
 ## Post-Deployment
 
