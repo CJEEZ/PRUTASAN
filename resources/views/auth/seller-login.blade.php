@@ -18,7 +18,8 @@
     <div class="border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <a href="{{ route('catalog.index') }}" class="flex items-center space-x-2">
-                <span class="text-xl font-bold text-orange-600">FruitWeb</span>
+                <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-12 w-12 object-contain">
+                <span class="text-xl font-bold text-orange-600">FruitExpress</span>
                 <span class="text-gray-400 text-sm ml-2">Seller Centre</span>
             </a>
             <a href="#" class="text-orange-600 text-sm font-medium hover:text-orange-700">Need help?</a>
@@ -33,7 +34,7 @@
                 <p class="text-orange-600 font-semibold text-sm mb-3 uppercase">FruitWeb Marketplace</p>
                 <h1 class="text-4xl font-bold text-orange-600 mb-4 leading-tight">Be a Power Seller</h1>
                 <p class="text-gray-700 text-lg mb-12 leading-relaxed">Manage your shop efficiently on FruitWeb with our Seller Centre</p>
-                
+
                 <!-- Shop Illustration Placeholder -->
                 <div class="mb-8">
                     <svg class="w-full h-64" viewBox="0 0 200 180" fill="none">
@@ -41,14 +42,14 @@
                         <rect x="20" y="90" width="80" height="40" fill="#FF6B35" rx="4"/>
                         <circle cx="40" cy="135" r="8" fill="#333"/>
                         <circle cx="85" cy="135" r="8" fill="#333"/>
-                        
+
                         <!-- Shop -->
                         <rect x="110" y="60" width="70" height="70" fill="#FFA500" rx="4"/>
                         <polygon points="110,60 145,20 180,60" fill="#FF8C00"/>
                         <rect x="120" y="75" width="15" height="20" fill="#4A90E2"/>
                         <rect x="155" y="75" width="15" height="20" fill="#4A90E2"/>
                         <rect x="137" y="110" width="16" height="20" fill="#8B4513"/>
-                        
+
                         <!-- Items on truck -->
                         <rect x="35" y="75" width="12" height="15" fill="#FF6347" rx="2"/>
                         <rect x="55" y="75" width="12" height="15" fill="#FFD700" rx="2"/>
@@ -86,7 +87,7 @@
                 <!-- Form Header -->
                 <div class="mb-8">
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">Log In</h2>
-                    
+
                     <!-- QR Code Button -->
                     <button type="button" class="w-full py-3 border-2 border-orange-400 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition mb-6 flex items-center justify-center space-x-2">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -99,7 +100,7 @@
                 <!-- Login Form -->
                 <form method="POST" action="{{ route('login') }}" class="space-y-5">
                     @csrf
-                    
+
                     @if ($errors->any())
                         <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
                             <ul class="list-disc list-inside">

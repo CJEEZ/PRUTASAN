@@ -5,10 +5,10 @@
 @section('content')
 <div class="min-h-screen p-6" style="background:#f8fafc;">
     <div class="max-w-4xl w-full bg-white rounded-lg shadow-md p-6 md:p-10 text-center mx-auto">
-    <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="Ornos Farm" class="h-12 md:h-20 mx-auto mb-4 w-auto object-contain">
+    <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="Ornos Farm" class="h-12 md:h-20 mx-auto mb-4 w-auto object-contain">
 
-    <h1 class="text-2xl font-semibold mb-2">Welcome to Fruit2Web Seller</h1>
-        <p class="text-gray-600 mb-6">Start selling on Fruit2Web — create your shop and manage products, orders and payouts.</p>
+    <h1 class="text-2xl font-semibold mb-2">Welcome to FruitExpress Seller</h1>
+        <p class="text-gray-600 mb-6">Start selling on FruitExpress — create your shop and manage products, orders and payouts.</p>
 
         @auth
             @if(Auth::user()->role === 'seller')

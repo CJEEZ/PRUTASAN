@@ -22,25 +22,49 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\Admin\AdminDriverController;
+use App\Http\Controllers\NotificationController;
 
 // 1. Routes accessible to GUESTS (Non-logged-in users)
 
+Route::middleware(['auth', 'track.activity'])->get('/presence/{user}', function (\App\Models\User $user) {
+    return response()->json([
+        'status' => $user->isOnline() ? 'online' : 'away',
+        'away_minutes' => $user->awayMinutes(),
+    ]);
+})->name('presence.show');
+
 // --- Root Route: Dashboard Landing Page (Requires Login) - NOT for admins ---
-Route::middleware(['auth', 'prevent-admin'])->group(function () {
+Route::middleware(['auth', 'prevent-admin', 'track.activity'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('home');
 });
 
 // --- Catalog Route (ACCESSIBLE TO ALL) ---
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::post('/products/{product}/reviews', [ProductController::class, 'storeReview'])
+    ->middleware('auth')
+    ->name('products.reviews.store');
 
 // --- Communication Routes ---
 Route::get('/contact', [InquiryController::class, 'create'])->name('inquiries.create');
 Route::post('/inquiries', [InquiryController::class, 'store'])->name('inquiries.store');
+Route::delete('/inquiries/conversations/{conversation}', [InquiryController::class, 'destroyConversation'])
+    ->middleware('auth')
+    ->name('inquiries.conversations.destroy');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+});
 
 
 // --- Cart Routes (ACCESSIBLE TO ALL - Guests can add items) ---
@@ -64,6 +88,8 @@ Route::post('/track-package', [TrackingController::class, 'publicTrack'])->name(
 Route::get('/track-package', function () {
     return view('tracking.search');
 })->name('tracking.search');
+Route::get('/tracking/{order}', [TrackingController::class, 'show'])->name('tracking.show');
+Route::get('/tracking/{order}/data', [TrackingController::class, 'getTrackingData'])->name('tracking.getTrackingData');
 
 
 // --- Authentication Routes (Login/Register) ---
@@ -76,6 +102,11 @@ Route::middleware('guest')->group(function () {
     Route::get('admin/login', [AdminLoginController::class, 'create'])->name('admin.login');
     Route::post('admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
 
+    Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
+    Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+    Route::get('auth/facebook', [SocialAuthController::class, 'redirectToFacebook']);
+    Route::get('auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback']);
+
     // Registration
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('register', [RegisteredUserController::class, 'store']);
@@ -84,10 +115,23 @@ Route::middleware('guest')->group(function () {
 
 // 2. Routes ONLY accessible to AUTHENTICATED USERS (Must log in) - NOT for admins
 
-Route::middleware(['auth', 'prevent-admin'])->group(function () {
+Route::middleware(['auth', 'prevent-admin', 'track.activity'])->group(function () {
 
     // --- Dashboard Route (USER LANDING PAGE) ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/driver', [DriverController::class, 'dashboard'])->name('driver.dashboard');
+    Route::post('/driver/application', [DriverController::class, 'submit'])->name('driver.application.submit');
+    Route::get('/driver/analytics', [DriverController::class, 'analytics'])->name('driver.analytics');
+    Route::get('/driver/schedule', [DriverController::class, 'schedule'])->name('driver.schedule');
+    Route::get('/driver/history', [DriverController::class, 'history'])->name('driver.history');
+    Route::get('/driver/messages', [DriverController::class, 'messages'])->name('driver.messages');
+    Route::get('/driver/profile', [DriverController::class, 'profile'])->name('driver.profile');
+    Route::patch('/driver/profile', [DriverController::class, 'updateProfile'])->name('driver.profile.update');
+    Route::patch('/driver/availability', [DriverController::class, 'availability'])->name('driver.availability');
+    Route::post('/driver/shipments/{shipment}/claim', [DriverController::class, 'claim'])->name('driver.shipments.claim');
+    Route::patch('/driver/shipments/{shipment}', [DriverController::class, 'updateDelivery'])->name('driver.shipments.update');
+    Route::post('/driver/shipments/{shipment}/location', [DriverController::class, 'updateLocation'])->name('driver.shipments.location');
 
     // --- Checkout Routes (REQUIRES AUTHENTICATION) ---
     // User must be logged in to access the checkout and place an order.
@@ -123,9 +167,6 @@ Route::middleware(['auth', 'prevent-admin'])->group(function () {
     // Request return for delivered orders
     Route::post('/orders/{order}/request-return', [OrderController::class, 'requestReturn'])->name('order.request_return');
 
-    // --- Tracking Routes ---
-    Route::get('/tracking/{order}', [TrackingController::class, 'show'])->name('tracking.show');
-    Route::get('/tracking/{order}/data', [TrackingController::class, 'getTrackingData'])->name('tracking.getTrackingData');
 });
 
 // Shared logout for any authenticated user (including admins)
@@ -137,10 +178,17 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
 // ==========================================================
 // 3. --- ADMIN ROUTES (Protected by the 'access-admin' Gate) ---
 // ==========================================================
-Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'can:access-admin', 'track.activity'])->prefix('admin')->name('admin.')->group(function () {
 
     // Admin Dashboard landing page
     Route::get('/', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('profile', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'profile'])->name('profile');
+    Route::post('profile', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('profile/change-password', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updatePassword'])->name('profile.change_password');
+
+    // Admin notification actions
+    Route::post('notifications/read-all', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::patch('notifications/{notification}/read', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
 
     // Product Management (Resource routes for CRUD)
     // Routes: admin/products, admin/products/create, admin/products/{id}/edit, etc.
@@ -193,6 +241,10 @@ Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->name('admin.')
         Route::delete('/{seller}', [AdminSellerController::class, 'destroy'])->name('destroy');
     });
 
+    // Driver Hiring
+    Route::get('drivers', [AdminDriverController::class, 'index'])->name('drivers.index');
+    Route::patch('drivers/{application}', [AdminDriverController::class, 'update'])->name('drivers.update');
+
     // Arindo Verification (admin)
     Route::prefix('arindo')->name('arindo.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminArindoController::class, 'index'])->name('index');
@@ -218,7 +270,7 @@ Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->name('admin.')
 // ==========================================================
 // 4. --- SELLER ROUTES ---
 // ==========================================================
-Route::middleware(['auth'])->prefix('seller')->name('seller.')->group(function () {
+Route::middleware(['auth', 'seller.approved'])->prefix('seller')->name('seller.')->group(function () {
     Route::get('start', [SellerDashboardController::class, 'start'])->name('start');
     Route::get('onboarding', [SellerDashboardController::class, 'onboarding'])->name('onboarding');
     Route::post('onboarding', [SellerDashboardController::class, 'processOnboarding'])->name('onboarding.process');
@@ -235,17 +287,15 @@ Route::middleware(['auth'])->prefix('seller')->name('seller.')->group(function (
     Route::delete('products/{id}', [SellerDashboardController::class, 'deleteProduct'])->name('products.delete');
 
     Route::get('arindo', [SellerDashboardController::class, 'arindoProperties'])->name('arindo.properties');
-    Route::get('arindo/create', [SellerDashboardController::class, 'addProduct'])->name('arindo.properties.create');
+    Route::get('arindo/create', [SellerDashboardController::class, 'addArindoProduct'])->name('arindo.properties.create');
 
     Route::get('orders', [SellerDashboardController::class, 'orders'])->name('orders');
     Route::get('orders/{id}', [SellerDashboardController::class, 'orderDetail'])->name('orders.detail');
-    Route::patch('orders/{id}', [SellerDashboardController::class, 'updateOrderStatus'])->name('orders.update');
+    Route::patch('orders/{id}/status', [SellerDashboardController::class, 'updateOrderStatus'])->name('orders.status');
     Route::post('orders/{order}/ship', [SellerShipmentController::class, 'store'])->name('orders.ship');
     Route::get('orders/{order}/track', [SellerShipmentController::class, 'show'])->name('orders.track');
 
     Route::get('shipments', [SellerShipmentController::class, 'index'])->name('shipments');
-    Route::patch('shipments/{id}', [SellerShipmentController::class, 'update'])->name('shipments.update');
-    Route::post('orders/{order}/update-tracking-location', [SellerShipmentController::class, 'updateTrackingLocation'])->name('orders.update_tracking_location');
 
     Route::get('approval', [SellerApprovalController::class, 'show'])->name('approval.show');
     Route::post('approval', [SellerApprovalController::class, 'store'])->name('approval.store');

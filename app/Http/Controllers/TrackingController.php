@@ -14,16 +14,24 @@ class TrackingController extends Controller
     public function show(Order $order)
     {
         // Check if user owns this order or is an admin
-        if (Auth::user()->role !== 'admin' && $order->user_id !== Auth::id()) {
+        if (Auth::guest() && session('public_tracking_order_id') !== $order->getKey()) {
             abort(403, 'Unauthorized access to this order.');
         }
 
-        if (Auth::user()->role !== 'admin' && ! $order->isTrackable()) {
+        if (Auth::check() && Auth::user()->role !== 'admin' && $order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to this order.');
+        }
+
+        if (Auth::check() && Auth::user()->role !== 'admin' && ! $order->isTrackable()) {
             return redirect()->route('profile.show')->with('error', 'Tracking is only available after your order has shipped.');
         }
 
         // Get shipment data
         $shipment = $order->shipment;
+        $latestDriverLocation = $order->trackingHistory()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->first();
 
         // Prepare tracking timeline
         $timeline = $this->getTrackingTimeline($order);
@@ -39,7 +47,10 @@ class TrackingController extends Controller
 
         // Check if we have location data for map
         $hasLocation = !empty($order->latitude) && !empty($order->longitude);
-        $hasDriverLocation = !empty($order->driver_latitude) && !empty($order->driver_longitude);
+        $hasDriverLocation = ($order->driver_latitude !== null && $order->driver_longitude !== null)
+            || (bool) $latestDriverLocation;
+        $driverLatitude = $order->driver_latitude ?? $latestDriverLocation?->latitude;
+        $driverLongitude = $order->driver_longitude ?? $latestDriverLocation?->longitude;
 
         // Get status badge info
         $statusInfo = $this->getStatusInfo($order->status);
@@ -52,6 +63,9 @@ class TrackingController extends Controller
             'hasLocation' => $hasLocation,
             'hasDriverLocation' => $hasDriverLocation,
             'statusInfo' => $statusInfo,
+            'latestDriverLocation' => $latestDriverLocation,
+            'driverLatitude' => $driverLatitude,
+            'driverLongitude' => $driverLongitude,
         ]);
     }
 
@@ -73,6 +87,8 @@ class TrackingController extends Controller
             return redirect()->back()->with('error', 'Order not found. Please check your order number and postal code.');
         }
 
+        session(['public_tracking_order_id' => $order->getKey()]);
+
         return redirect()->route('tracking.show', $order);
     }
 
@@ -82,6 +98,10 @@ class TrackingController extends Controller
     public function getTrackingData(Order $order)
     {
         // Check if user owns this order or is an admin
+        if (Auth::guest() && session('public_tracking_order_id') !== $order->getKey()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         if (Auth::check() && Auth::user()->role !== 'admin' && $order->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -91,6 +111,10 @@ class TrackingController extends Controller
         }
 
         $shipment = $order->shipment;
+        $latestDriverLocation = $order->trackingHistory()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->first();
         $timeline = $this->getTrackingTimeline($order);
         $statusInfo = $this->getStatusInfo($order->status);
 
@@ -107,8 +131,12 @@ class TrackingController extends Controller
             'timeline' => $timeline,
             'total' => $order->total,
             'items_count' => $order->items->count(),
-            'driver_latitude' => $order->driver_latitude,
-            'driver_longitude' => $order->driver_longitude,
+            'driver_latitude' => $order->driver_latitude ?? $latestDriverLocation?->latitude,
+            'driver_longitude' => $order->driver_longitude ?? $latestDriverLocation?->longitude,
+            'driver_assigned' => (bool) $shipment?->driver_id,
+            'driver_name' => $shipment?->driver?->name,
+            'driver_location_updated_at' => $order->driver_location_updated_at?->toIso8601String(),
+            'current_location' => $order->current_location,
             'customer_latitude' => $order->latitude,
             'customer_longitude' => $order->longitude,
         ]);
@@ -132,7 +160,7 @@ class TrackingController extends Controller
         ];
 
         // Confirmed/Processing
-        if (in_array($order->status, ['confirmed', 'processing', 'packed', 'shipped', 'in_transit', 'out_for_delivery', 'to_receive', 'delivered'])) {
+        if (in_array($order->status, ['confirmed', 'processing', 'preparing', 'packed', 'ready_for_pickup', 'shipped', 'in_transit', 'out_for_delivery', 'to_receive', 'delivered'])) {
             $timeline[] = [
                 'status' => 'confirmed',
                 'label' => 'Order Confirmed',
@@ -140,6 +168,19 @@ class TrackingController extends Controller
                 'timestamp' => $order->updated_at->format('Y-m-d H:i'),
                 'completed' => true,
                 'icon' => 'check-circle',
+            ];
+        }
+
+        if (in_array($order->status, ['preparing', 'ready_for_pickup'])) {
+            $timeline[] = [
+                'status' => $order->status,
+                'label' => $order->status === 'ready_for_pickup' ? 'To Ship' : 'Preparing',
+                'description' => $order->status === 'ready_for_pickup'
+                    ? 'Your order is packed and ready for rider pickup'
+                    : 'Seller accepted your order and is preparing it',
+                'timestamp' => $order->updated_at->format('Y-m-d H:i'),
+                'completed' => true,
+                'icon' => $order->status === 'ready_for_pickup' ? 'box' : 'box-open',
             ];
         }
 
@@ -247,6 +288,18 @@ class TrackingController extends Controller
                 'color' => 'yellow',
                 'icon' => 'hourglass-half',
                 'description' => 'Waiting for seller confirmation',
+            ],
+            'preparing' => [
+                'label' => 'Preparing',
+                'color' => 'blue',
+                'icon' => 'box-open',
+                'description' => 'Seller accepted your order and is preparing it',
+            ],
+            'ready_for_pickup' => [
+                'label' => 'To Ship',
+                'color' => 'blue',
+                'icon' => 'box',
+                'description' => 'Your order is packed and ready for rider pickup',
             ],
             'confirmed' => [
                 'label' => 'Confirmed',

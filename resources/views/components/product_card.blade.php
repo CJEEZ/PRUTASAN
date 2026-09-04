@@ -22,12 +22,14 @@
                 {{ $product->name }} ({{ $product->unit ?? '1kg' }})
             </h3>
 
-            <!-- Rating and Sales Count (Mock data for design) -->
+            <!-- Rating and sales count -->
             <div class="mt-2 flex items-center text-xs text-gray-500">
-                <i class="fas fa-star text-yellow-400 mr-1"></i>
-                <span class="font-bold mr-2">4.9</span>
+                <span class="flex flex-row text-amber-400" dir="ltr" aria-label="{{ number_format($product->average_rating ?? 0, 1) }} out of 5 stars">
+                    @for($star = 1; $star <= 5; $star++){!! $star <= round($product->average_rating ?? 0) ? '&#9733;' : '&#9734;' !!}@endfor
+                </span>
+                <span class="font-bold mr-2 ml-1">{{ number_format($product->average_rating ?? 0, 1) }}</span>
                 <span class="text-gray-400">|</span>
-                <span class="ml-2">1523 sold</span>
+                <span class="ml-2">{{ number_format($product->sold_quantity ?? 0, 0) }} sold</span>
             </div>
 
             <!-- Price -->

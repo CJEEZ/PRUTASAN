@@ -17,7 +17,7 @@
                     <h1 class="text-3xl font-bold">My Arindo Properties</h1>
                     <p class="text-gray-600">Manage your land listings, track verification status, and update property terms.</p>
                 </div>
-                <a href="{{ route('seller.products.add') }}" class="px-5 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">Add New Arindo Property</a>
+                <a href="{{ route('seller.arindo.properties.create') }}" class="px-5 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">Add New Arindo Property</a>
             </div>
         </div>
 

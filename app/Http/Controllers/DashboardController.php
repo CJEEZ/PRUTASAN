@@ -20,7 +20,9 @@ class DashboardController extends Controller
         $category = $request->query('category');
 
         // Get all products with category relation
-        $query = Product::with('category');
+        $query = Product::with('category')
+            ->withSum('orderItems as sold_quantity', 'quantity')
+            ->withAvg('reviews as average_rating', 'rating');
 
         // Filter by category name (tropical, seasonal, exotic, arindo)
         if ($category) {

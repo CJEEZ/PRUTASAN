@@ -63,6 +63,7 @@ class Notification extends Model
     public function getTypeLabel(): string
     {
         return match($this->type) {
+            'message' => 'Messages',
             'order_update' => 'Order Updates',
             'promotion' => 'Promotions',
             'wallet_update' => 'Wallet Updates',

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Inquiry;
+use App\Models\DriverApplication;
 use Carbon\Carbon;
 
 class SellerDashboardController extends Controller
@@ -373,6 +374,7 @@ class SellerDashboardController extends Controller
         // Get seller record for bank account info
         $seller = $user->seller ?? $user;
         $paymentMethods = $user->paymentMethods()->latest()->get();
+        $driverApplications = DriverApplication::with('user')->latest()->take(6)->get();
 
         // Render user-facing seller dashboard
         return view('seller.dashboard', compact(
@@ -393,7 +395,8 @@ class SellerDashboardController extends Controller
             'topProducts',
             'recentActivities',
             'communicationTickets',
-            'paymentMethods'
+            'paymentMethods',
+            'driverApplications'
         ));
     }
 
@@ -433,25 +436,44 @@ class SellerDashboardController extends Controller
         return view('seller.order_detail', compact('order'));
     }
 
-    /**
-     * Update seller order status.
-     */
     public function updateOrderStatus(Request $request, $id)
     {
         $user = Auth::user();
-        if (! $user || $user->role !== 'seller') {
-            abort(403);
-        }
-        $sellerId = $user->id;
-        $order = \App\Models\Order::whereHas('items.product', function ($q) use ($sellerId) {
-            $q->where('seller_id', $sellerId);
-        })->findOrFail($id);
+        abort_unless($user && $user->role === 'seller', 403);
+
         $data = $request->validate([
-            'status' => ['required', 'string'],
+            'status' => ['required', 'in:pending,preparing,ready_for_pickup,cancelled'],
         ]);
-        $order->status = $data['status'];
-        $order->save();
-        return redirect()->route('seller.orders.detail', $order->id)->with('success', 'Order status updated.');
+        $order = \App\Models\Order::whereHas('items.product', function ($query) use ($user) {
+            $query->where('seller_id', $user->id);
+        })->with('shipment')->findOrFail($id);
+
+        if ($order->shipment && in_array($order->shipment->status, ['in_transit', 'out_for_delivery', 'delivered'], true)) {
+            return back()->with('error', 'This order is already with the rider and can no longer be changed by the seller.');
+        }
+
+        $order->update(['status' => $data['status']]);
+        if ($order->shipment) {
+            $order->shipment->update([
+                'status' => $data['status'] === 'ready_for_pickup' ? 'ready_for_pickup' : $data['status'],
+            ]);
+        }
+
+        $statusLabel = match ($data['status']) {
+            'ready_for_pickup' => 'Ready to pick-up / To ship',
+            'preparing' => 'Preparing',
+            'cancelled' => 'Cancelled',
+            default => 'Pending',
+        };
+        \App\Models\Notification::create([
+            'user_id' => $order->user_id,
+            'type' => 'order_update',
+            'title' => 'Order status updated',
+            'message' => 'Your order ' . $order->order_number . ' is now ' . $statusLabel . '.',
+            'order_id' => $order->id,
+        ]);
+
+        return back()->with('success', 'Order action status updated to ' . $statusLabel . '.');
     }
 
     /**
@@ -550,12 +572,22 @@ class SellerDashboardController extends Controller
      */
     public function addProduct()
     {
+        return $this->showProductForm(false);
+    }
+
+    public function addArindoProduct()
+    {
+        return $this->showProductForm(true);
+    }
+
+    private function showProductForm(bool $isArindo)
+    {
         $user = Auth::user();
         if (! $user || $user->role !== 'seller') {
             abort(403);
         }
         $categories = \App\Models\Category::all();
-        return view('seller.product_add', compact('categories'));
+        return view('seller.product_add', compact('categories', 'isArindo'));
     }
 
     /**
@@ -601,17 +633,22 @@ class SellerDashboardController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'unit' => ['required', 'string'],
             'image_url' => ['nullable', 'string'],
-            'is_arindo' => ['nullable', 'boolean'],
-            'loan_amount' => ['nullable', 'numeric', 'min:0'],
-            'term_years' => ['nullable', 'integer', 'min:1'],
-            'expiration_date' => ['nullable', 'date'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'map_location' => ['nullable', 'string', 'max:255'],
-            'crop_yield_description' => ['nullable', 'string'],
-            'land_photo_urls' => ['nullable', 'string'],
-            'soil_report_url' => ['nullable', 'url'],
-            'legal_document_url' => ['nullable', 'url'],
         ]);
+
+        if ($request->has('is_arindo')) {
+            $data = array_merge($data, $request->validate([
+                'is_arindo' => ['required', 'accepted'],
+                'loan_amount' => ['nullable', 'numeric', 'min:0'],
+                'term_years' => ['nullable', 'integer', 'min:1'],
+                'expiration_date' => ['nullable', 'date'],
+                'location' => ['nullable', 'string', 'max:255'],
+                'map_location' => ['nullable', 'string', 'max:255'],
+                'crop_yield_description' => ['nullable', 'string'],
+                'land_photo_urls' => ['nullable', 'string'],
+                'soil_report_url' => ['nullable', 'url'],
+                'legal_document_url' => ['nullable', 'url'],
+            ]));
+        }
         $landPhotoUrls = collect(explode("\n", $data['land_photo_urls'] ?? ''))
             ->map(fn ($line) => trim($line))
             ->filter()

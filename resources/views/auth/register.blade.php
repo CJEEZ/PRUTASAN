@@ -21,16 +21,28 @@
     <div class="min-h-screen flex flex-col items-center justify-center p-4 login-page relative overflow-hidden" style="background-image: linear-gradient(rgba(255,255,255,0.58), rgba(255,255,255,0.66)), url('{{ asset('Screenshot 2026-07-04 102403.png') }}'); background-size: cover; background-position: center;">
         <div class="w-full max-w-sm">
             <div class="text-center mb-6">
-                <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain mb-2 mx-auto block">
+                <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain mb-2 mx-auto block">
 
                 <p class="text-sm text-emerald-500">Create your account</p>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-2xl p-6">
+            <div class="bg-white rounded-2xl border-2 border-emerald-900 shadow-2xl p-6">
+                @if(session('signup_success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm" role="alert">
+                        {{ session('signup_success') }}
+                    </div>
+                @endif
+
+                @if(session('account_not_found'))
+                    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg mb-4 text-sm" role="alert">
+                        {{ session('account_not_found') }}
+                    </div>
+                @endif
+
                 <div class="mb-6">
                     <div id="role-tabs" class="flex bg-gray-100 rounded-full p-1">
-                        <button data-role="customer" class="flex-1 py-2 rounded-full text-sm font-semibold text-emerald-600 bg-white shadow-sm">Customer</button>
-                        <button data-role="driver" class="flex-1 py-2 rounded-full text-sm font-semibold text-emerald-600/70">Driver</button>
+                        <button type="button" data-role="customer" class="flex-1 py-2 rounded-full text-sm font-semibold text-emerald-600 bg-white shadow-sm">Customer</button>
+                        <button type="button" data-role="driver" class="flex-1 py-2 rounded-full text-sm font-semibold text-emerald-600/70">Driver</button>
                     </div>
                 </div>
 

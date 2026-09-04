@@ -29,7 +29,7 @@ git commit -m "Initial commit for Render deployment"
 5. Configure deployment:
    - **Name**: `prutexpres` (or your preferred name)
    - **Runtime**: PHP
-   - **Build Command**: `composer install && php artisan migrate --force`
+  - **Build Command**: `composer install --no-interaction --prefer-dist --optimize-autoloader && npm ci && npm run build && php artisan migrate --force && php artisan storage:link --force`
    - **Start Command**: `php artisan serve --host=0.0.0.0 --port=$PORT`
 
 ### 4. Set Environment Variables
@@ -40,10 +40,13 @@ In Render dashboard, add these environment variables:
 | `APP_KEY` | Generate from `php artisan key:generate` locally, copy output |
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | `false` |
+| `APP_URL` | Your Render service URL, including `https://` |
 | `LOG_CHANNEL` | `stderr` |
 | `DB_CONNECTION` | `pgsql` |
 | `SESSION_DRIVER` | `cookie` |
-| `CACHE_DRIVER` | `file` |
+| `CACHE_STORE` | `file` |
+| `QUEUE_CONNECTION` | `sync` |
+| `FILESYSTEM_DISK` | `public` for temporary uploads, or configure S3 for durable production storage |
 
 **Database Variables**: These will be auto-populated if using Render's PostgreSQL
 
@@ -56,16 +59,16 @@ In Render dashboard, add these environment variables:
 - Click "**Create Web Service**"
 - Render will automatically:
   - Clone your repository
-  - Install dependencies
+  - Install PHP and Node dependencies
+  - Build frontend assets
   - Run migrations
+  - Create the public storage link
   - Start your app
 
 ## Post-Deployment
 
 ### Generate App Key
-If not set during deployment:
-1. SSH into Render instance (via dashboard)
-2. Run: `php artisan key:generate`
+Generate an application key privately with `php artisan key:generate --show`, then add it as the `APP_KEY` secret in Render. Never commit it to `render.yaml` or `.env`.
 
 ### Run Migrations
 ```bash

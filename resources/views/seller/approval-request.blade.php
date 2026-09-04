@@ -14,7 +14,7 @@
             <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <h2 class="text-lg font-semibold text-yellow-800 mb-2">⏳ Request Pending</h2>
                 <p class="text-yellow-700">Your seller approval request is under review. The admin will contact you shortly.</p>
-                <p class="text-sm text-yellow-600 mt-2">Submitted on: {{ $user->seller_request_date?->format('M d, Y') }}</p>
+                <p class="text-sm text-yellow-600 mt-2">Submitted on: {{ $user->seller_request_date?->format('M d, Y') ?? 'Date unavailable' }}</p>
             </div>
         @elseif ($user->seller_status === 'approved')
             <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -82,13 +82,6 @@
             </div>
         @endif
 
-        <!-- Logout Link -->
-        <div class="text-center mt-8">
-            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                @csrf
-                <button type="submit" class="text-gray-600 hover:text-gray-800 underline">Log Out</button>
-            </form>
-        </div>
     </div>
 </div>
 @endsection

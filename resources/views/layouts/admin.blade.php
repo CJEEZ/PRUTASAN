@@ -57,7 +57,9 @@
             body { overflow-x: hidden; }
             .main-content { width: 100%; }
             #sidebar {
-                width: min(84vw, 280px);
+                width: min(86vw, 20rem);
+                max-height: 100dvh;
+                overflow-y: auto;
                 padding-bottom: 1rem;
             }
             #sidebar .sidebar-nav {
@@ -82,11 +84,11 @@
     <div class="flex min-h-screen overflow-hidden flex-col md:flex-row">
         <div id="mobile-sidebar-overlay" class="fixed inset-0 z-30 hidden bg-black/40 md:hidden"></div>
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] -translate-x-full transform bg-gradient-to-b from-green-800 to-green-900 text-white shadow-lg transition-transform duration-300 md:static md:w-64 md:translate-x-0 md:flex-shrink-0">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 h-dvh w-[min(86vw,20rem)] max-w-[86vw] -translate-x-full transform overflow-y-auto bg-gradient-to-b from-green-800 to-green-900 text-white shadow-lg transition-transform duration-300 md:static md:h-screen md:w-64 md:translate-x-0 md:flex-shrink-0">
             <!-- Logo -->
             <div class="p-6 border-b border-green-700">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-                    <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}"
+                    <img src="{{ asset('ORNOSFARM_LOGOS.png') }}"
                          alt="FruitExpress"
                          class="h-16 md:h-20 w-auto object-contain">
                     <div class="min-w-0">
@@ -135,6 +137,11 @@
                         <span>Sellers</span>
                     </a>
 
+                    <a href="{{ route('admin.drivers.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition {{ Route::is('admin.drivers.*') ? 'active' : 'hover:bg-green-700' }}">
+                        <i class="fas fa-id-card w-5"></i>
+                        <span>Driver Applications</span>
+                    </a>
+
                     <!-- Arindo Verification -->
                     <a href="{{ route('admin.arindo.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition {{ Route::is('admin.arindo.*') ? 'active' : 'hover:bg-green-700' }}">
                         <i class="fas fa-landmark w-5"></i>
@@ -168,7 +175,7 @@
             </nav>
 
             <!-- User Info Footer -->
-            <div class="user-card absolute bottom-0 left-0 right-0 mx-3 mb-3 rounded-xl border border-green-700/60 bg-green-900/40 px-3 py-3 sm:mx-4 sm:px-4 sm:py-4">
+            <div class="user-card relative mx-3 mt-6 mb-3 rounded-xl border border-green-700/60 bg-green-900/40 px-3 py-3 sm:mx-4 sm:px-4 sm:py-4">
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-3">
                         <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-400 text-sm font-bold text-green-900">
@@ -179,7 +186,7 @@
                             <p class="text-xs text-green-200">Admin</p>
                         </div>
                     </div>
-                    <a href="{{ route('profile.show') }}" class="flex items-center justify-center gap-2 rounded-lg border border-green-700/60 bg-white/10 px-2 py-2 text-sm font-medium text-white transition hover:bg-white/20">
+                    <a href="{{ route('admin.profile') }}" class="flex items-center justify-center gap-2 rounded-lg border border-green-700/60 bg-white/10 px-2 py-2 text-sm font-medium text-white transition hover:bg-white/20">
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
                     </a>
@@ -208,9 +215,55 @@
                         <button id="mobile-sidebar-toggle" class="rounded-lg p-2 text-gray-600 hover:bg-gray-100 md:hidden">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
-                        <button class="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
-                            <i class="fas fa-bell"></i>
-                        </button>
+                        @php
+                            $adminNotifications = \App\Models\Notification::where('user_id', Auth::id())
+                                ->latest()
+                                ->take(10)
+                                ->get();
+                            $unreadNotificationCount = $adminNotifications->where('is_read', false)->count();
+                        @endphp
+                        <div class="relative">
+                            <button id="admin-notification-toggle" type="button" class="relative rounded-lg p-2 text-gray-600 transition hover:bg-gray-100" aria-label="Notifications" aria-expanded="false">
+                                <i class="fas fa-bell text-base"></i>
+                                <span id="admin-notification-badge" class="absolute -right-1 -top-1 hidden min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+                                    {{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}
+                                </span>
+                            </button>
+                            <div id="admin-notification-panel" class="absolute right-0 top-12 z-50 hidden w-[min(92vw,24rem)] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+                                <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+                                    <h3 class="font-semibold text-gray-900">Notifications</h3>
+                                    @if ($unreadNotificationCount > 0)
+                                        <form method="POST" action="{{ route('admin.notifications.read-all') }}">
+                                            @csrf
+                                            <button id="admin-notification-mark-all" type="submit" class="text-xs font-semibold text-green-700 hover:text-green-900">Mark all read</button>
+                                        </form>
+                                    @endif
+                                </div>
+                                <div class="max-h-[min(65vh,28rem)] overflow-y-auto">
+                                    @forelse ($adminNotifications as $notification)
+                                        <form method="POST" action="{{ route('admin.notifications.read', $notification) }}" class="notification-item-form border-b border-gray-100 last:border-0" data-notification-read="{{ $notification->is_read ? 'true' : 'false' }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="flex w-full gap-3 px-4 py-3 text-left transition hover:bg-gray-50 {{ $notification->is_read ? 'bg-white' : 'bg-green-50/60' }}">
+                                                <span class="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full {{ $notification->type === 'order_update' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600' }}">
+                                                    <i class="fas {{ $notification->type === 'order_update' ? 'fa-shopping-bag' : 'fa-user-plus' }} text-xs"></i>
+                                                </span>
+                                                <span class="min-w-0">
+                                                    <span class="block text-sm font-semibold text-gray-900">{{ $notification->title }}</span>
+                                                    <span class="mt-0.5 block text-xs leading-5 text-gray-600">{{ $notification->message }}</span>
+                                                    <span class="mt-1 block text-[11px] text-gray-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                                </span>
+                                                @if (! $notification->is_read)
+                                                    <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-green-600"></span>
+                                                @endif
+                                            </button>
+                                        </form>
+                                    @empty
+                                        <p class="px-4 py-8 text-center text-sm text-gray-500">No notifications yet.</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
                         <button class="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
                             <i class="fas fa-message"></i>
                         </button>
@@ -269,6 +322,21 @@
             const sidebarToggle = document.getElementById('mobile-sidebar-toggle');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-sidebar-overlay');
+            const notificationToggle = document.getElementById('admin-notification-toggle');
+            const notificationPanel = document.getElementById('admin-notification-panel');
+            const notificationBadge = document.getElementById('admin-notification-badge');
+            const markAllReadButton = document.getElementById('admin-notification-mark-all');
+
+            const updateAdminNotificationBadge = () => {
+                if (!notificationBadge) return;
+
+                const unreadCount = Array.from(document.querySelectorAll('.notification-item-form[data-notification-read="false"]')).length;
+                const displayValue = unreadCount > 9 ? '9+' : String(unreadCount || 0);
+
+                notificationBadge.textContent = displayValue;
+                notificationBadge.classList.toggle('hidden', unreadCount === 0);
+                notificationBadge.classList.toggle('inline-flex', unreadCount > 0);
+            };
 
             const mobileBottomNav = document.getElementById('mobile-bottom-nav');
 
@@ -333,6 +401,53 @@
             };
 
             setActiveLink();
+
+            if (notificationToggle && notificationPanel) {
+                updateAdminNotificationBadge();
+
+                notificationToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const isHidden = notificationPanel.classList.toggle('hidden');
+                    notificationToggle.setAttribute('aria-expanded', String(!isHidden));
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!notificationPanel.contains(event.target) && !notificationToggle.contains(event.target)) {
+                        notificationPanel.classList.add('hidden');
+                        notificationToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                document.querySelectorAll('.notification-item-form').forEach((form) => {
+                    form.addEventListener('submit', () => {
+                        form.dataset.notificationRead = 'true';
+                        const button = form.querySelector('button[type="submit"]');
+                        if (button) {
+                            button.classList.remove('bg-green-50/60');
+                            button.classList.add('bg-white');
+                        }
+                        const unreadDot = form.querySelector('span.rounded-full.bg-green-600');
+                        if (unreadDot) unreadDot.remove();
+                        updateAdminNotificationBadge();
+                    });
+                });
+
+                if (markAllReadButton) {
+                    markAllReadButton.closest('form')?.addEventListener('submit', () => {
+                        document.querySelectorAll('.notification-item-form[data-notification-read="false"]').forEach((form) => {
+                            form.dataset.notificationRead = 'true';
+                            const button = form.querySelector('button[type="submit"]');
+                            if (button) {
+                                button.classList.remove('bg-green-50/60');
+                                button.classList.add('bg-white');
+                            }
+                            const unreadDot = form.querySelector('span.rounded-full.bg-green-600');
+                            if (unreadDot) unreadDot.remove();
+                        });
+                        updateAdminNotificationBadge();
+                    });
+                }
+            }
 
             sidebarLinks.forEach((link) => {
                 link.addEventListener('click', () => {

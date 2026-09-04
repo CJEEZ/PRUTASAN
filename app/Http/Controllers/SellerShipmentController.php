@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use App\Models\Order;
 use App\Models\Shipment;
 use App\Services\TrackingService;
-use App\Events\RiderLocationUpdated;
 
 class SellerShipmentController extends Controller
 {
@@ -41,18 +39,12 @@ class SellerShipmentController extends Controller
             [
                 'tracking_number' => $data['tracking_number'],
                 'carrier' => $data['carrier'] ?? null,
-                'status' => 'shipped',
+                'status' => 'ready_for_pickup',
                 'shipped_at' => now(),
             ]
         );
 
-        // Update order status using tracking service
-        $this->trackingService->updateOrderStatus(
-            $order,
-            'shipped',
-            null,
-            'Order has been shipped. Tracking number: ' . $data['tracking_number']
-        );
+        $order->update(['status' => 'ready_for_pickup']);
 
         return redirect()->back()->with('success', 'Shipment tracking saved.');
     }
@@ -89,85 +81,4 @@ class SellerShipmentController extends Controller
         return view('seller.shipments', compact('shipments'));
     }
 
-    /**
-     * Update shipment status (mark as shipped/delivered).
-     */
-    public function update(Request $request, $id)
-    {
-        $user = Auth::user();
-        if (! $user || $user->role !== 'seller') {
-            abort(403);
-        }
-        $shipment = Shipment::with('order')->findOrFail($id);
-        $sellerId = $user->id;
-        $hasSeller = $shipment->order && $shipment->order->hasSeller($sellerId);
-        if (! $hasSeller) {
-            abort(403);
-        }
-        $data = $request->validate([
-            'status' => ['required', 'string'],
-        ]);
-        $shipment->status = $data['status'];
-        $shipment->save();
-        return redirect()->route('seller.shipments')->with('success', 'Shipment updated.');
-    }
-
-    /**
-     * Update tracking location (for drivers/delivery updates)
-     */
-    public function updateTrackingLocation(Request $request, Order $order)
-    {
-        $user = Auth::user();
-        if (! $user || $user->role !== 'seller') {
-            abort(403);
-        }
-
-        if (! $order->hasSeller($user->id)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $data = $request->validate([
-            'location' => 'nullable|string',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'status' => 'nullable|string',
-        ]);
-
-        // Update order with driver location
-        $updates = [];
-        if (isset($data['latitude']) && isset($data['longitude'])) {
-            $updates['driver_latitude'] = $data['latitude'];
-            $updates['driver_longitude'] = $data['longitude'];
-        }
-        if (isset($data['status'])) {
-            $updates['status'] = $data['status'];
-        }
-        if ($updates) {
-            $order->update($updates);
-        }
-
-        // Log tracking update
-        $this->trackingService->logTrackingUpdate(
-            $order,
-            $data['status'] ?? $order->status,
-            $data['location'] ?? null,
-            'Location update from driver',
-            $data['latitude'] ?? null,
-            $data['longitude'] ?? null
-        );
-
-        // Broadcast the updated rider location immediately.
-        Event::dispatch(new RiderLocationUpdated(
-            $order,
-            $data['latitude'] ?? $order->driver_latitude,
-            $data['longitude'] ?? $order->driver_longitude,
-            $data['status'] ?? $order->status,
-            $data['location'] ?? null,
-        ));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tracking location updated successfully',
-        ]);
-    }
 }

@@ -7,12 +7,12 @@
 <div class="min-h-screen flex flex-col items-center justify-center px-3 py-4 sm:p-4 login-page relative overflow-hidden" style="background-image: linear-gradient(rgba(255,255,255,0.58), rgba(255,255,255,0.66)), url('{{ asset('Screenshot 2026-07-04 102403.png') }}'); background-size: cover; background-position: center;">
     <div class="text-center mb-6 sm:mb-8">
         <div class="flex justify-center mb-4">
-            <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain">
+            <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain">
         </div>
         <p class="text-gray-600 mt-1">Welcome back! Please login to continue</p>
     </div>
 
-    <div class="w-full max-w-sm bg-white p-4 sm:p-8 rounded-xl shadow-2xl transition duration-500 hover:shadow-2xl">
+    <div class="w-full max-w-sm bg-white p-4 sm:p-8 rounded-xl border-2 border-emerald-900 shadow-2xl transition duration-500 hover:shadow-2xl">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Login</h2>
         <p class="text-sm text-gray-500 mb-6">Enter your credentials to access your account.</p>
 
@@ -47,9 +47,14 @@
 
             <div class="mb-6">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input id="password" type="password" name="password" required autocomplete="current-password"
-                    placeholder="••••••••"
-                    class="w-full min-h-touch-target px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-base transition duration-150 focus:outline-none focus:border-green-600">
+                <div class="relative">
+                    <input id="password" type="password" name="password" required autocomplete="current-password"
+                        placeholder="••••••••"
+                        class="w-full min-h-touch-target px-4 py-2.5 pr-12 bg-white border border-gray-200 rounded-lg text-base transition duration-150 focus:outline-none focus:border-green-600">
+                    <button type="button" data-password-toggle="password" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-green-600" aria-label="Show password" title="Show password">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
                 @error('password')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -96,4 +101,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('[data-password-toggle]').forEach(function (toggle) {
+        toggle.addEventListener('click', function () {
+            const password = document.getElementById(toggle.dataset.passwordToggle);
+            const isHidden = password.type === 'password';
+            password.type = isHidden ? 'text' : 'password';
+            toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            toggle.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
+            toggle.querySelector('i').className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+        });
+    });
+</script>
+
 @endsection

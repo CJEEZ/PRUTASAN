@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
+use App\Models\Notification;
 use App\Services\CartService;
 
 class CheckoutController extends Controller
@@ -227,6 +229,16 @@ class CheckoutController extends Controller
                     'shipping' => $shipping,
                     'total' => $total,
                 ]);
+
+                User::where('role', 'admin')->each(function ($admin) use ($order): void {
+                    Notification::create([
+                        'user_id' => $admin->id,
+                        'type' => 'order_update',
+                        'title' => 'New Order Received',
+                        'message' => Auth::user()->name . ' placed order ' . $order->order_number . '.',
+                        'order_id' => $order->id,
+                    ]);
+                });
 
                 // Create order items and decrement stock
                 foreach ($cartItems as $item) {

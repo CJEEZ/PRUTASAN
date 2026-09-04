@@ -31,6 +31,7 @@ class Order extends Model
         'longitude',
         'driver_latitude',
         'driver_longitude',
+        'driver_location_updated_at',
         'subtotal',
         'shipping',
         'total',
@@ -44,6 +45,7 @@ class Order extends Model
         'shipping' => 'decimal:2',
         'total' => 'decimal:2',
         'payment_confirmed_at' => 'datetime',
+        'driver_location_updated_at' => 'datetime',
     ];
 
     /**
@@ -90,6 +92,8 @@ class Order extends Model
     }
 
     public const TRACKABLE_STATUSES = [
+        'preparing',
+        'ready_for_pickup',
         'shipped',
         'in_transit',
         'out_for_delivery',

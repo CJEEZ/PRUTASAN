@@ -37,6 +37,8 @@ class CatalogController extends Controller
 
         // --- 2. Build the Product Query ---
         $query = Product::query()->with('category')
+            ->withSum('orderItems as sold_quantity', 'quantity')
+            ->withAvg('reviews as average_rating', 'rating')
             ->where(function ($q) {
                 // Show products that are not assigned to a seller OR whose seller is admin-approved
                 $q->whereNull('seller_id')
@@ -53,7 +55,7 @@ class CatalogController extends Controller
                   ->orWhere('description', 'LIKE', '%' . $searchTerm . '%');
             });
         }
-        
+
         // Apply Category Filter
         if ($categorySlug && $categorySlug !== 'all') {
             $selectedCategory = Category::where('slug', $categorySlug)->first();
@@ -71,7 +73,7 @@ class CatalogController extends Controller
         if ($isExotic) {
             $query->where('is_exotic', true);
         }
-        
+
         // Always order by latest product
         $products = $query->latest()->get();
 

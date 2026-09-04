@@ -11,6 +11,48 @@ class LoginFlowTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_customer_registration_shows_success_message_without_logging_in(): void
+    {
+        $this->withoutMiddleware();
+
+        $response = $this->post('/register', [
+            'name' => 'Customer User',
+            'email' => 'customer@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'customer',
+        ]);
+
+        $response->assertRedirect(route('register'));
+        $response->assertSessionHas('signup_success', 'Your customer account has already been created. Please log in with your email and password.');
+        $this->assertGuest();
+        $this->assertDatabaseHas('users', [
+            'email' => 'customer@example.com',
+            'role' => 'customer',
+        ]);
+    }
+
+    public function test_driver_registration_shows_success_message_without_logging_in(): void
+    {
+        $this->withoutMiddleware();
+
+        $response = $this->post('/register', [
+            'name' => 'Driver User',
+            'email' => 'driver@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'driver',
+        ]);
+
+        $response->assertRedirect(route('register'));
+        $response->assertSessionHas('signup_success', 'Your driver account has already been created. Please log in with your email and password.');
+        $this->assertGuest();
+        $this->assertDatabaseHas('users', [
+            'email' => 'driver@example.com',
+            'role' => 'driver',
+        ]);
+    }
+
     public function test_user_can_login_and_is_redirected_to_dashboard(): void
     {
         $user = User::factory()->create([

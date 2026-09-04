@@ -19,7 +19,8 @@
                                         <div>
                                             <div class="flex items-center gap-3">
                                                 <h4 class="font-semibold text-gray-800">Order #{{ $order->order_number }}</h4>
-                                                <span class="text-xs px-2 py-1 rounded text-white {{ $order->status === 'pending' ? 'bg-yellow-500' : ($order->status === 'cancelled' ? 'bg-red-500' : 'bg-gray-700') }}">{{ ucfirst($order->status) }}</span>
+                                                @php $customerStatusLabels = ['pending' => 'Pending', 'preparing' => 'Preparing', 'ready_for_pickup' => 'To Ship', 'packed' => 'To Ship', 'confirmed' => 'To Ship', 'shipped' => 'To Receive', 'in_transit' => 'In Transit', 'out_for_delivery' => 'Out for Delivery', 'to_receive' => 'To Receive', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled']; @endphp
+                                                <span class="text-xs px-2 py-1 rounded text-white {{ $order->status === 'pending' ? 'bg-yellow-500' : ($order->status === 'cancelled' ? 'bg-red-500' : 'bg-gray-700') }}">{{ $customerStatusLabels[$order->status] ?? ucfirst(str_replace('_', ' ', $order->status)) }}</span>
                                             </div>
                                             <p class="text-sm text-gray-600 mt-1">{{ $order->created_at->format('Y-m-d H:i') }}</p>
                                             @if($order->items->count())
@@ -35,7 +36,7 @@
                                         <div class="mt-3 flex items-center justify-end gap-2">
                                             <button data-order-id="{{ $order->id }}" class="order-details inline-block px-3 py-1 bg-white border text-sm rounded text-gray-700">Details</button>
 
-                                            @if(in_array($order->status, \App\Models\Order::TRACKABLE_STATUSES, true))
+                                            @if(in_array($order->status, \App\Models\Order::TRACKABLE_STATUSES, true) && ! in_array($order->status, ['preparing', 'ready_for_pickup', 'packed', 'confirmed', 'delivered', 'completed'], true))
                                                 <a href="{{ route('tracking.show', $order) }}" class="inline-block px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-semibold">
                                                     <i class="fas fa-truck mr-1"></i> Track
                                                 </a>

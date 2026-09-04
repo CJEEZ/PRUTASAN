@@ -12,7 +12,7 @@ class Shipment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_id', 'tracking_number', 'carrier', 'status', 'shipped_at',
+        'order_id', 'driver_id', 'tracking_number', 'carrier', 'status', 'shipped_at',
     ];
 
     protected $casts = [
@@ -25,6 +25,11 @@ class Shipment extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'driver_id');
     }
 
     /**

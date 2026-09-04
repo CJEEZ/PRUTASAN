@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\PaymentMethod;
 use App\Models\Address;
+use App\Models\DriverApplication;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -36,6 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'seller_request_date',
         'is_approved',
         'email_verified_at',
+        'driver_available',
+        'last_seen_at',
     ];
 
     /**
@@ -55,9 +58,25 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'seller_request_date' => 'datetime',
         'deleted_at' => 'datetime',
         'password' => 'hashed',
+        'last_seen_at' => 'datetime',
     ];
+
+    public function isOnline(): bool
+    {
+        return $this->last_seen_at?->gt(now()->subMinutes(2)) ?? false;
+    }
+
+    public function awayMinutes(): ?int
+    {
+        if (! $this->last_seen_at || $this->isOnline()) {
+            return null;
+        }
+
+        return max(1, (int) $this->last_seen_at->diffInMinutes(now()));
+    }
 
     /**
      * Get the computed seller status for the admin dashboard.
@@ -81,10 +100,19 @@ class User extends Authenticatable implements MustVerifyEmail
         return 'pending';
     }
 
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        if (empty($this->profile_photo_path)) {
+            return '';
+        }
+
+        return asset('storage/' . ltrim($this->profile_photo_path, '/'));
+    }
+
     // Role check helper
     public function isAdmin(): bool
     {
-        return $this->role === 'admin' && strtolower((string) $this->email) === 'admin@fruitexpress.com';
+        return strtolower((string) $this->role) === 'admin';
     }
 
     // Relationship to Cart
@@ -132,5 +160,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function defaultAddress()
     {
         return $this->hasOne(Address::class)->where('is_default', true);
+    }
+
+    public function driverApplications()
+    {
+        return $this->hasMany(DriverApplication::class);
+    }
+
+    public function driverShipments()
+    {
+        return $this->hasMany(\App\Models\Shipment::class, 'driver_id');
     }
 }

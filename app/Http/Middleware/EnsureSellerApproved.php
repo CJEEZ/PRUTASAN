@@ -20,12 +20,11 @@ class EnsureSellerApproved
             return $next($request);
         }
 
-        // If seller not approved (email_verified_at null), allow viewing but show a warning.
-        // This lets sellers access their dashboard while still preventing sensitive actions
-        // (withdrawal etc. are protected by other middleware).
-        if (is_null($user->email_verified_at)) {
-            $request->session()->flash('warning', 'Your seller account is pending admin approval. Some actions may be restricted.');
-            return $next($request);
+        if ($user->seller_status !== 'approved' && ! $request->routeIs('seller.approval.*')) {
+            return redirect()->route('seller.approval.show')->with(
+                'warning',
+                'Your seller account must be approved by an admin before you can access the seller dashboard.'
+            );
         }
 
         return $next($request);

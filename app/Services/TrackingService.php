@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Order;
-use App\Models\Shipment;
 use App\Models\TrackingHistory;
 use Carbon\Carbon;
 
@@ -54,10 +53,11 @@ class TrackingService
         }
 
         // Update driver location if provided
-        if ($latitude && $longitude) {
+        if ($latitude !== null && $longitude !== null) {
             $order->update([
                 'driver_latitude' => $latitude,
                 'driver_longitude' => $longitude,
+                'driver_location_updated_at' => now(),
             ]);
         }
 

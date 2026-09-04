@@ -10,6 +10,11 @@
             </a>
             <h1 class="text-3xl font-bold text-gray-900">Order Tracking</h1>
             <p class="text-gray-600 mt-2">Order #{{ $order->order_number }}</p>
+            @if($shipment?->driver)
+                <p class="mt-2 text-sm text-emerald-700"><i class="fas fa-truck mr-1"></i> Assigned driver: <strong>{{ $shipment->driver->name }}</strong></p>
+            @elseif($shipment)
+                <p class="mt-2 text-sm text-amber-700"><i class="fas fa-clock mr-1"></i> Waiting for a driver to accept this shipment</p>
+            @endif
             {{-- Map and broadcast status will be shown near the map so the page remains friendly. --}}
         </div>
 
@@ -77,6 +82,18 @@
 
                     <a href="/docs/tracking-setup" class="ml-auto text-sm text-blue-600 hover:underline">Setup instructions</a>
                 </div>
+
+                @if($hasDriverLocation || $latestDriverLocation)
+                    <div class="mt-4 rounded-lg border border-red-100 bg-red-50 p-4 text-sm text-red-900">
+                        <p class="font-semibold"><i class="fas fa-location-dot mr-2"></i>Rider's last reported location</p>
+                        <p class="mt-1">{{ $order->current_location ?: 'GPS location available' }}</p>
+                        <p id="driverLocationFreshness" class="mt-1 text-xs text-red-700">Last GPS update: {{ $order->driver_location_updated_at?->diffForHumans() ?? 'from tracking history' }}</p>
+                    </div>
+                @else
+                    <div class="mt-4 rounded-lg border border-yellow-100 bg-yellow-50 p-4 text-sm text-yellow-900">
+                        The rider has not shared a GPS location yet.
+                    </div>
+                @endif
 
                 <div id="routeInfo" class="mt-3 text-sm text-gray-700 hidden">
                     <strong>ETA:</strong> <span id="routeEta">—</span>
@@ -231,7 +248,10 @@
 
                             <div>
                                 <p class="text-xs font-semibold text-gray-500 uppercase">Status</p>
-                                <p class="text-gray-900 font-medium">{{ $shipment->status ?? 'In Transit' }}</p>
+                                @php
+                                    $customerShipmentStatusLabels = ['ready_for_pickup' => 'To Ship', 'in_transit' => 'In Transit', 'out_for_delivery' => 'Out for Delivery', 'to_receive' => 'To Receive', 'delivered' => 'Delivered'];
+                                @endphp
+                                <p class="text-gray-900 font-medium">{{ $customerShipmentStatusLabels[$shipment->status] ?? ucfirst(str_replace('_', ' ', $shipment->status ?? 'In Transit')) }}</p>
                             </div>
 
                             @if($shipment->shipped_at)
@@ -481,7 +501,7 @@
 
             @if($hasDriverLocation)
                 driverMarker = createMarker(
-                    { lat: parseFloat('{{ $order->driver_latitude }}'), lng: parseFloat('{{ $order->driver_longitude }}') },
+                    { lat: parseFloat('{{ $driverLatitude }}'), lng: parseFloat('{{ $driverLongitude }}') },
                     liveMap,
                     'Driver Location',
                     'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
@@ -552,7 +572,7 @@
 
             @if($hasDriverLocation && in_array($order->status, ['shipped', 'in_transit', 'out_for_delivery']))
                 driverMarker = createMarker(
-                    { lat: parseFloat('{{ $order->driver_latitude }}'), lng: parseFloat('{{ $order->driver_longitude }}') },
+                    { lat: parseFloat('{{ $driverLatitude }}'), lng: parseFloat('{{ $driverLongitude }}') },
                     staticMap,
                     'Driver Location',
                     'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
@@ -619,7 +639,7 @@
 
         @if($hasDriverLocation)
             driverMarker = createMarker(
-                { lat: parseFloat('{{ $order->driver_latitude }}'), lng: parseFloat('{{ $order->driver_longitude }}') },
+                { lat: parseFloat('{{ $driverLatitude }}'), lng: parseFloat('{{ $driverLongitude }}') },
                 liveMap,
                 'Driver Location',
                 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
@@ -693,7 +713,7 @@
 
         @if($hasDriverLocation && in_array($order->status, ['shipped', 'in_transit', 'out_for_delivery']))
             driverMarker = createMarker(
-                { lat: parseFloat('{{ $order->driver_latitude }}'), lng: parseFloat('{{ $order->driver_longitude }}') },
+                { lat: parseFloat('{{ $driverLatitude }}'), lng: parseFloat('{{ $driverLongitude }}') },
                 staticMap,
                 'Driver Location',
                 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
@@ -727,6 +747,11 @@
 
                 if (data.status) {
                     console.log('Order status:', data.status);
+                }
+
+                const freshness = document.getElementById('driverLocationFreshness');
+                if (freshness && data.driver_location_updated_at) {
+                    freshness.textContent = 'Last GPS update: ' + new Date(data.driver_location_updated_at).toLocaleTimeString();
                 }
             })
             .catch(error => console.log('Error fetching tracking data:', error));
@@ -836,7 +861,7 @@
         @if($hasDriverLocation)
             setTimeout(function() {
                 try {
-                    const pos = { lat: parseFloat('{{ $order->driver_latitude }}'), lng: parseFloat('{{ $order->driver_longitude }}') };
+                    const pos = { lat: parseFloat('{{ $driverLatitude }}'), lng: parseFloat('{{ $driverLongitude }}') };
                     if (typeof updateDriverMarker === 'function') updateDriverMarker(pos);
                     if (typeof updateLeafletDriverMarker === 'function' && typeof L !== 'undefined') {
                         try { updateLeafletDriverMarker(pos); } catch (e) { /* ignore */ }
@@ -904,6 +929,9 @@
 
     // If maps library doesn't load within X seconds, show a helpful message
     (function waitForMaps() {
+        const googleMapsRequested = {{ preg_match('/^AIza[0-9A-Za-z_-]{20,}$/', (string) env('GOOGLE_MAPS_API_KEY')) ? 'true' : 'false' }};
+        if (!googleMapsRequested) return;
+
         const checkAfter = 8000; // ms
         setTimeout(() => {
             if (!window.google || !window.google.maps || typeof initOrderTrackingMap !== 'function') {
@@ -913,7 +941,7 @@
         }, checkAfter);
     })();
 </script>
-@if(!empty(env('GOOGLE_MAPS_API_KEY')))
+@if(preg_match('/^AIza[0-9A-Za-z_-]{20,}$/', (string) env('GOOGLE_MAPS_API_KEY')))
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initOrderTrackingMap"></script>
 @else
     <script>

@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Shipment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -87,20 +88,20 @@ class AdminOrderController extends Controller
     public function update(Request $request, int $id)
     {
         $order = Order::findOrFail($id);
-        
+
         $validated = $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled,return_requested',
+            'status' => 'required|in:pending,preparing,ready_for_pickup,confirmed,processing,packed,shipped,in_transit,out_for_delivery,to_receive,delivered,cancelled,return_requested',
             'payment_status' => 'nullable|in:pending,paid,failed',
             'gcash_reference' => 'nullable|string|max:100',
         ]);
 
         // Update order status
         $order->status = $validated['status'];
-        
+
         // Update payment status if provided
         if (isset($validated['payment_status'])) {
             $order->payment_status = $validated['payment_status'];
-            
+
             // Set payment confirmed timestamp if marked as paid
             if ($validated['payment_status'] === 'paid' && !$order->payment_confirmed_at) {
                 $order->payment_confirmed_at = now();
@@ -113,6 +114,24 @@ class AdminOrderController extends Controller
         }
 
         $order->save();
+
+        if (in_array($validated['status'], ['ready_for_pickup', 'shipped', 'in_transit', 'out_for_delivery', 'to_receive', 'delivered'], true)) {
+            $shipment = $order->shipment ?: new Shipment(['order_id' => $order->id]);
+            $shipment->tracking_number = $shipment->tracking_number ?: 'F2W-' . $order->order_number;
+            $shipment->status = $validated['status'] === 'to_receive' ? 'out_for_delivery' : $validated['status'];
+            $shipment->shipped_at = $shipment->shipped_at ?: now();
+            $shipment->save();
+        }
+
+        if ($order->user_id) {
+            Notification::create([
+                'user_id' => $order->user_id,
+                'type' => 'order_update',
+                'title' => 'Order status updated',
+                'message' => 'Your order ' . $order->order_number . ' is now ' . str_replace('_', ' ', $validated['status']) . '.',
+                'order_id' => $order->id,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Order updated successfully.');
     }

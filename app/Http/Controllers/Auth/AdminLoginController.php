@@ -28,32 +28,25 @@ class AdminLoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (strtolower($credentials['email']) !== 'admin@fruitexpress.com') {
-            return back()->withErrors(['admin' => 'Invalid administrator credentials.']);
-        }
+        $adminEmail = strtolower($credentials['email']);
 
-        // Attempt to authenticate the canonical admin only
         if (Auth::attempt([
-            'email' => 'admin@fruitexpress.com',
+            'email' => $adminEmail,
             'password' => $credentials['password'],
         ])) {
             $user = Auth::user();
 
-            // Final guard: only the canonical admin account can access the admin area
-            if ($user->role !== 'admin' || strtolower((string) $user->email) !== 'admin@fruitexpress.com') {
+            if (strtolower((string) $user->role) !== 'admin') {
                 Auth::logout();
                 $request->session()->invalidate();
                 return back()->withErrors(['admin' => 'Invalid administrator credentials.']);
             }
 
-            // Regenerate session
             $request->session()->regenerate();
 
-            // Redirect to admin dashboard
             return redirect()->route('admin.dashboard');
         }
 
-        // Authentication failed
         return back()->withErrors(['admin' => 'Invalid credentials.']);
     }
 

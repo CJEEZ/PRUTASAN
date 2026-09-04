@@ -24,12 +24,20 @@
                         <div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <h4 class="font-semibold text-white text-base">Order #{{ $order->order_number }}</h4>
-                                <span class="text-[10px] px-2 py-1 rounded-full {{ $order->status === 'pending' ? 'bg-amber-500/20 text-amber-200' : ($order->status === 'cancelled' ? 'bg-red-500/20 text-red-200' : 'bg-slate-700 text-slate-200') }}">{{ ucfirst($order->status) }}</span>
+                                @php
+                                    $customerStatusLabels = ['pending' => 'Pending', 'preparing' => 'Preparing', 'ready_for_pickup' => 'To Ship', 'cancelled' => 'Cancelled', 'in_transit' => 'In Transit', 'out_for_delivery' => 'Out for Delivery', 'to_receive' => 'To Receive', 'delivered' => 'Delivered'];
+                                @endphp
+                                <span class="text-[10px] px-2 py-1 rounded-full {{ $order->status === 'pending' ? 'bg-amber-500/20 text-amber-200' : ($order->status === 'cancelled' ? 'bg-red-500/20 text-red-200' : 'bg-slate-700 text-slate-200') }}">{{ $customerStatusLabels[$order->status] ?? ucfirst(str_replace('_', ' ', $order->status)) }}</span>
                             </div>
                             <p class="text-xs text-slate-400 mt-1">{{ $order->created_at->format('Y-m-d H:i') }}</p>
                             @if($order->items->count())
                                 <p class="text-xs text-slate-300 mt-2">{{ $order->items->first()->product->name ?? 'Item' }} <span class="text-slate-500">x{{ $order->items->first()->quantity ?? 1 }}</span></p>
                                 <p class="text-[10px] text-slate-500 mt-1">{{ $order->items->count() - 1 }} more item(s)</p>
+                            @endif
+                            @if($order->shipment?->driver)
+                                <p class="mt-2 text-xs text-emerald-300"><i class="fas fa-truck mr-1"></i> Driver assigned: {{ $order->shipment->driver->name }}</p>
+                            @elseif($order->shipment && in_array($order->status, ['ready_for_pickup', 'shipped'], true))
+                                <p class="mt-2 text-xs text-amber-300"><i class="fas fa-clock mr-1"></i> Waiting for driver assignment</p>
                             @endif
                         </div>
                     </div>
@@ -39,12 +47,14 @@
                         <p class="text-2xl font-semibold text-white">₱{{ number_format($order->total ?? $order->total_amount ?? 0, 2) }}</p>
                         @php
                             $trackableStatuses = \App\Models\Order::TRACKABLE_STATUSES;
-                            $isToShip = in_array($order->status, ['shipped','to_ship','packed','confirmed']);
+                            $isToShip = in_array($order->status, ['preparing', 'ready_for_pickup', 'shipped','to_ship','packed','confirmed']);
+                            $canCustomerTrack = in_array($order->status, $trackableStatuses, true)
+                                && ! in_array($order->status, ['preparing', 'packed', 'confirmed', 'delivered', 'completed'], true);
                             $actionButtonClass = 'inline-flex min-h-[30px] w-[88px] items-center justify-center rounded-full px-2.5 py-1.5 text-center text-[10px] font-semibold leading-tight';
                         @endphp
                         <div class="mt-3 flex flex-wrap items-center justify-end gap-2">
                             <button data-order-id="{{ $order->id }}" class="order-details {{ $actionButtonClass }} bg-[#0f291f] text-slate-100 border border-slate-700 hover:bg-[#16362b]">Details</button>
-                            @if(in_array($order->status, $trackableStatuses, true))
+                            @if($canCustomerTrack)
                                 <a href="{{ route('tracking.show', $order) }}" class="{{ $actionButtonClass }} bg-emerald-600 hover:bg-emerald-700 text-white">
                                     <span class="inline-flex items-center justify-center gap-1"><i class="fas fa-truck text-[9px]"></i> Track</span>
                                 </a>

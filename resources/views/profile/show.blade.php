@@ -49,9 +49,9 @@
                         <ul class="space-y-2 py-2">
                             <li><a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm {{ ($activeSection ?? 'account') === 'account' ? 'bg-emerald-600/15 text-emerald-200' : 'text-slate-300 hover:bg-slate-800' }}"><i class="fas fa-shopping-bag w-4"></i> My Purchase</a></li>
                             <li><a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm {{ ($activeSection ?? '') === 'edit' ? 'bg-emerald-600/15 text-emerald-200' : 'text-slate-300 hover:bg-slate-800' }}"><i class="fas fa-user-circle w-4"></i> My Account</a></li>
-                            <li><a href="{{ route('profile.notifications') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm text-slate-300 hover:bg-slate-800"><i class="fas fa-comment-dots w-4"></i> Messages</a></li>
-                            <li><a href="{{ route('profile.banks') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm text-slate-300 hover:bg-slate-800"><i class="fas fa-credit-card w-4"></i> Banks &amp; Cards</a></li>
-                            <li><a href="{{ route('profile.change_password') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm text-slate-300 hover:bg-slate-800"><i class="fas fa-lock w-4"></i> Change Password</a></li>
+                            <li><a href="{{ route('profile.notifications') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm {{ ($activeSection ?? '') === 'messages' ? 'bg-emerald-600/15 text-emerald-200' : 'text-slate-300 hover:bg-slate-800' }}"><i class="fas fa-comment-dots w-4"></i> Messages</a></li>
+                            <li><a href="{{ route('profile.banks') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm {{ ($activeSection ?? '') === 'banks' ? 'bg-emerald-600/15 text-emerald-200' : 'text-slate-300 hover:bg-slate-800' }}"><i class="fas fa-credit-card w-4"></i> Banks &amp; Cards</a></li>
+                            <li><a href="{{ route('profile.change_password') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-sm {{ ($activeSection ?? '') === 'change-password' ? 'bg-emerald-600/15 text-emerald-200' : 'text-slate-300 hover:bg-slate-800' }}"><i class="fas fa-lock w-4"></i> Change Password</a></li>
                         </ul>
                     </nav>
                 </div>

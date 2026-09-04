@@ -21,6 +21,10 @@ class PreventAdminAccessUserRoutes
             return redirect()->route('admin.dashboard');
         }
 
+        if (Auth::check() && Auth::user()->role === 'driver' && ! $request->routeIs('driver.*')) {
+            return redirect()->route('driver.dashboard');
+        }
+
         return $next($request);
     }
 }

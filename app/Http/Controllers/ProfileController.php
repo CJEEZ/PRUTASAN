@@ -25,13 +25,13 @@ class ProfileController extends Controller
         $statusMap = [
             'all' => null,
             'pending' => ['pending'],
-            'packed' => ['packed', 'confirmed'],
-            'shipped' => ['shipped'],
+            'packed' => ['preparing', 'ready_for_pickup', 'packed', 'confirmed'],
+            'shipped' => ['shipped', 'in_transit', 'out_for_delivery', 'to_receive'],
             'delivered' => ['delivered', 'completed'],
             'cancelled' => ['cancelled'],
         ];
 
-        $query = $user->orders()->with('items.product')->latest();
+        $query = $user->orders()->with(['items.product', 'shipment.driver'])->latest();
         if ($status !== 'all') {
             $dbStatuses = $statusMap[$status] ?? [$status];
             $query->whereIn('status', $dbStatuses);
@@ -41,8 +41,14 @@ class ProfileController extends Controller
 
         $orderStats = $this->getOrderStats($user->id);
         $activeOrderFilter = $status;
+        $driverApplication = $user->role === 'driver' ? $user->driverApplications()->latest()->first() : null;
+        $driverStats = $user->role === 'driver' ? [
+            'active' => $user->driverShipments()->whereIn('status', ['shipped', 'in_transit', 'out_for_delivery', 'to_receive'])->count(),
+            'completed' => $user->driverShipments()->whereIn('status', ['delivered', 'completed'])->count(),
+            'total' => $user->driverShipments()->count(),
+        ] : null;
 
-        return view('profile.show', compact('user', 'orders', 'orderStats', 'activeOrderFilter'));
+        return view('profile.show', compact('user', 'orders', 'orderStats', 'activeOrderFilter', 'driverApplication', 'driverStats'));
     }
 
     /**
@@ -226,13 +232,13 @@ class ProfileController extends Controller
         $statusMap = [
             'all' => null,
             'pending' => ['pending'],
-            'packed' => ['packed', 'confirmed'],
-            'shipped' => ['shipped'],
+            'packed' => ['preparing', 'ready_for_pickup', 'packed', 'confirmed'],
+            'shipped' => ['shipped', 'in_transit', 'out_for_delivery', 'to_receive'],
             'delivered' => ['delivered', 'completed'],
             'cancelled' => ['cancelled'],
         ];
 
-        $query = $user->orders()->with('items.product')->latest();
+        $query = $user->orders()->with(['items.product', 'shipment.driver'])->latest();
         if ($status !== 'all') {
             $dbStatuses = $statusMap[$status] ?? [$status];
             $query->whereIn('status', $dbStatuses);
@@ -314,9 +320,9 @@ class ProfileController extends Controller
         $buckets = [
             'all' => [],
             'pending' => ['pending'],
-            // Some DBs use 'confirmed' instead of 'packed'
-            'packed' => ['packed', 'confirmed'],
-            'shipped' => ['shipped'],
+            // Customer-facing "To Ship" includes every seller preparation stage.
+            'packed' => ['preparing', 'ready_for_pickup', 'packed', 'confirmed'],
+            'shipped' => ['shipped', 'in_transit', 'out_for_delivery', 'to_receive'],
             // Accept both 'delivered' and older 'completed' values
             'delivered' => ['delivered', 'completed'],
             'cancelled' => ['cancelled'],

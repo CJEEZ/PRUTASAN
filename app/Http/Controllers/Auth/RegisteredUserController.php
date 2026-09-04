@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Notification;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -65,6 +66,15 @@ class RegisteredUserController extends Controller
             'role' => 'seller',
         ]);
 
+        User::where('role', 'admin')->each(function (User $admin) use ($seller): void {
+            Notification::create([
+                'user_id' => $admin->id,
+                'type' => 'system_update',
+                'title' => 'New User Registration',
+                'message' => $seller->name . ' registered a new seller account.',
+            ]);
+        });
+
         // Do NOT auto-login; redirect back to signup page with success message
         // User will see login form and log in manually
         return redirect(route('seller.register'))->with('signup_success', 'Account created successfully! Please log in with your email and password.');
@@ -77,12 +87,12 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // Validation rules including the required 'role' field
+        // Public signup may create customer or driver accounts only.
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:customer,seller,admin'], // Accept seller role
+            'role' => ['required', 'string', 'in:customer,driver'],
         ]);
 
         $user = User::create([
@@ -92,7 +102,29 @@ class RegisteredUserController extends Controller
             'role' => $request->role, // Store the role from the request
         ]);
 
+        User::where('role', 'admin')->each(function (User $admin) use ($user): void {
+            Notification::create([
+                'user_id' => $admin->id,
+                'type' => 'system_update',
+                'title' => 'New User Registration',
+                'message' => $user->name . ' registered a new ' . $user->role . ' account.',
+            ]);
+        });
+
         // event(new Registered($user)); // Disabled - no email verification needed
+
+        if ($user->role === 'customer') {
+            Auth::login($user);
+
+            return redirect()->intended(route('home'));
+        }
+
+        if ($user->role === 'driver') {
+            return redirect(route('register'))->with(
+                'signup_success',
+                'Your driver account has been created. Please log in with your email and password.'
+            );
+        }
 
         Auth::login($user);
 
@@ -104,6 +136,10 @@ class RegisteredUserController extends Controller
         if ($user->role === 'seller') {
             // After registering as a seller, send user to the onboarding flow
             return redirect()->intended(route('seller.onboarding'));
+        }
+
+        if ($user->role === 'driver') {
+            return redirect()->route('driver.dashboard');
         }
 
         // Default: redirect customer users to the user dashboard (home route)

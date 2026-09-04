@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        if (! User::where('email', $request->input('email'))->exists()) {
+            return back()
+                ->withInput(['email' => $request->input('email')])
+                ->withErrors(['email' => 'No account was found for this email. Please register first.']);
+        }
+
         // 1. I-authenticate ang user (kasama na ang rate limiting)
         Log::info('login-store-before-authenticate', [
             'email' => $request->input('email'),
@@ -52,6 +59,14 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended('/admin');
         }
 
+        if ($user->role === 'driver') {
+            return redirect()->route('driver.dashboard');
+        }
+
+        if ($user->role === 'seller' && $user->seller_status !== 'approved') {
+            return redirect()->route('home');
+        }
+
         // Regular users go to the app home/dashboard
         return redirect()->intended('/');
     }
@@ -67,6 +82,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('home');
     }
 }

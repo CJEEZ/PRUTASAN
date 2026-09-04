@@ -13,12 +13,12 @@
     <div class="min-h-screen flex flex-col items-center justify-center p-4" style="background: linear-gradient(to bottom right, #fff4e0, #ffedd5);">
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-4">
-                    <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain mx-auto block">
+                    <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain mx-auto block">
                 </div>
                 <p class="text-gray-600 mt-1">Create your seller account</p>
             </div>
 
-        <div class="w-full max-w-sm bg-white p-8 rounded-xl shadow-2xl transition duration-500 hover:shadow-2xl">
+        <div class="w-full max-w-sm bg-white p-8 rounded-xl border-2 border-emerald-900 shadow-2xl transition duration-500 hover:shadow-2xl">
             @if(session('signup_success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
                     {{ session('signup_success') }}

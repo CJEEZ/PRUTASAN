@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'prevent-admin' => \App\Http\Middleware\PreventAdminAccessUserRoutes::class,
+            'seller.approved' => \App\Http\Middleware\EnsureSellerApproved::class,
+            'track.activity' => \App\Http\Middleware\TrackUserActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

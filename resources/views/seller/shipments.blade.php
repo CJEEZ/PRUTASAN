@@ -25,7 +25,7 @@
                             <th class="hidden px-3 py-2 font-semibold text-gray-700 sm:table-cell sm:px-4 sm:py-3">Carrier</th>
                             <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Status</th>
                             <th class="hidden px-3 py-2 font-semibold text-gray-700 lg:table-cell lg:px-4 lg:py-3">Shipped At</th>
-                            <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Action</th>
+                            <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Assigned rider</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,22 +39,16 @@
                                     @if($shipment->status === 'shipped') bg-blue-100 text-blue-800
                                     @elseif($shipment->status === 'delivered') bg-green-100 text-green-800
                                     @else bg-gray-100 text-gray-800 @endif">
-                                    {{ ucfirst($shipment->status) }}
+                                    {{ $shipment->status === 'ready_for_pickup' ? 'To Ship' : ucfirst(str_replace('_', ' ', $shipment->status)) }}
                                 </span>
                             </td>
                             <td class="hidden px-3 py-2 align-middle lg:table-cell lg:px-4 lg:py-3">{{ $shipment->shipped_at ? $shipment->shipped_at->format('Y-m-d') : '-' }}</td>
                             <td class="px-3 py-2 align-middle sm:px-4 sm:py-3">
-                                <form method="POST" action="{{ route('seller.shipments.update', $shipment->id) }}" class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="tracking_number" value="{{ $shipment->tracking_number }}">
-                                    <input type="hidden" name="carrier" value="{{ $shipment->carrier }}">
-                                    <select name="status" class="min-h-[32px] rounded border border-gray-300 px-2 py-1 text-xs sm:text-sm">
-                                        <option value="shipped" {{ $shipment->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                                        <option value="delivered" {{ $shipment->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                                    </select>
-                                    <button type="submit" class="min-h-[32px] rounded bg-orange-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-orange-700 sm:text-sm">Update</button>
-                                </form>
+                                @if($shipment->driver)
+                                    <span class="text-sm text-gray-700">{{ $shipment->driver->name }}</span>
+                                @else
+                                    <span class="text-xs text-gray-500">Waiting for rider</span>
+                                @endif
                             </td>
                         </tr>
                         @empty

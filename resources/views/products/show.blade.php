@@ -31,6 +31,16 @@
                         <p class="mt-2">{{ $product->unit ?? '1kg' }}</p>
                     </div>
                 </div>
+
+                <div class="rounded-2xl bg-amber-50 p-4 text-sm text-slate-700">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="flex flex-row text-lg tracking-wide text-amber-500" dir="ltr">
+                            @for($star = 1; $star <= 5; $star++){!! $star <= round($product->reviews_avg_rating ?? 0) ? '&#9733;' : '&#9734;' !!}@endfor
+                        </span>
+                        <span class="text-xl font-bold text-slate-900">{{ number_format($product->reviews_avg_rating ?? 0, 1) }}</span>
+                        <span class="text-slate-500">{{ $product->reviews->count() }} {{ $product->reviews->count() === 1 ? 'review' : 'reviews' }}</span>
+                    </div>
+                </div>
             </div>
 
             <div class="grid gap-4 lg:grid-cols-2">
@@ -99,5 +109,67 @@
             </div>
         </aside>
     </div>
+
+    <section class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-slate-900">Customer ratings and comments</h2>
+                <p class="mt-1 text-sm text-slate-500">Share your experience with this product.</p>
+            </div>
+            @auth
+                <span class="text-sm text-slate-500">Signed in as {{ auth()->user()->name }}</span>
+            @else
+                <a href="{{ route('login') }}" class="text-sm font-semibold text-orange-600 hover:underline">Log in to review</a>
+            @endauth
+        </div>
+
+        @if(session('success'))
+            <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('success') }}</div>
+        @endif
+
+        @auth
+            <form method="POST" action="{{ route('products.reviews.store', $product) }}" class="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-[12rem_1fr_auto] sm:items-start">
+                @csrf
+                <div>
+                    <label for="rating" class="block text-sm font-medium text-slate-700">Rating</label>
+                    <div class="-mt-1 flex flex-row items-center gap-1" role="radiogroup" aria-label="Product rating" dir="ltr">
+                        @for($rating = 1; $rating <= 5; $rating++)
+                            <input id="rating-{{ $rating }}" type="radio" name="rating" value="{{ $rating }}" required class="peer sr-only" {{ old('rating') == $rating ? 'checked' : '' }}>
+                            <label for="rating-{{ $rating }}" class="cursor-pointer text-3xl leading-10 text-gray-300 transition hover:text-amber-400 peer-checked:text-amber-500" title="{{ $rating }} out of 5 stars">&#9733;</label>
+                        @endfor
+                    </div>
+                    @error('rating')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="comment" class="block text-sm font-medium text-slate-700">Comment</label>
+                    <textarea id="comment" name="comment" rows="3" maxlength="2000" placeholder="Tell other customers what you think..." class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm">{{ old('comment') }}</textarea>
+                    @error('comment')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+                <button type="submit" class="rounded-xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-700">Save review</button>
+            </form>
+        @endauth
+
+        <div class="mt-6 space-y-4 border-t border-slate-100 pt-5">
+            @forelse($product->reviews as $review)
+                <article class="rounded-2xl bg-slate-50 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <p class="font-semibold text-slate-900">{{ $review->user->name ?? 'Customer' }}</p>
+                            <p class="text-xs text-slate-500">{{ $review->created_at->format('M d, Y') }}</p>
+                        </div>
+                        <span class="flex flex-row text-xl tracking-wide text-amber-500" dir="ltr">
+                            @for($star = 1; $star <= 5; $star++){!! $star <= $review->rating ? '&#9733;' : '&#9734;' !!}@endfor
+                            <span class="ml-1 text-sm text-slate-500">({{ $review->rating }}/5)</span>
+                        </span>
+                    </div>
+                    @if($review->comment)
+                        <p class="mt-3 text-sm leading-6 text-slate-700">{{ $review->comment }}</p>
+                    @endif
+                </article>
+            @empty
+                <p class="py-4 text-sm text-slate-500">No ratings or comments yet.</p>
+            @endforelse
+        </div>
+    </section>
 </div>
 @endsection

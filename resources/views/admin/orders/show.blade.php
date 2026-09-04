@@ -30,7 +30,12 @@
                     <select name="status" class="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
                         <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                        <option value="preparing" {{ $order->status === 'preparing' ? 'selected' : '' }}>Preparing</option>
+                        <option value="ready_for_pickup" {{ $order->status === 'ready_for_pickup' ? 'selected' : '' }}>Ready for pickup</option>
                         <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                        <option value="in_transit" {{ $order->status === 'in_transit' ? 'selected' : '' }}>In transit</option>
+                        <option value="out_for_delivery" {{ $order->status === 'out_for_delivery' ? 'selected' : '' }}>Out for delivery</option>
+                        <option value="to_receive" {{ $order->status === 'to_receive' ? 'selected' : '' }}>To receive</option>
                         <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
                         <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                         <option value="return_requested" {{ $order->status === 'return_requested' ? 'selected' : '' }}>Return Requested</option>
@@ -123,7 +128,7 @@
                             @else bg-gray-100 text-gray-800 @endif">
                             {{ $order->payment_method === 'cod' ? 'Cash on Delivery (COD)' : ($order->payment_method === 'gcash' ? 'GCash' : ucfirst($order->payment_method)) }}
                         </div>
-                        
+
                         <!-- Payment Status Badge -->
                         @if($order->payment_method === 'gcash')
                             <div class="mt-4">
@@ -144,7 +149,7 @@
                                     @method('PATCH')
                                     <div class="mb-3">
                                         <label for="gcash_reference" class="block text-sm font-medium text-gray-700 mb-1">GCash Reference Number</label>
-                                        <input type="text" name="gcash_reference" id="gcash_reference" 
+                                        <input type="text" name="gcash_reference" id="gcash_reference"
                                             value="{{ old('gcash_reference', $order->gcash_reference) }}"
                                             placeholder="Enter GCash transaction ID"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">

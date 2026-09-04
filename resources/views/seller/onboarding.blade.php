@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-h-screen p-6" style="background:#f8fafc;">
     <div class="max-w-2xl w-full bg-white rounded-lg shadow-md p-6 md:p-10 mx-auto">
-        <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="Ornos Farm" class="h-12 md:h-20 mx-auto mb-6 w-auto object-contain">
+        <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="Ornos Farm" class="h-12 md:h-20 mx-auto mb-6 w-auto object-contain">
 
         <h1 class="text-3xl font-bold mb-2 text-center">Ready to Become a Seller?</h1>
         <p class="text-gray-600 mb-8 text-center">Join thousands of sellers on Fruit2Web. Grow your business and reach more customers.</p>
@@ -62,7 +62,7 @@
 
         <form action="{{ route('seller.onboarding.process') }}" method="POST" class="mt-8">
             @csrf
-            
+
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <h3 class="font-semibold text-blue-900 mb-2">What's Next?</h3>
                 <p class="text-sm text-blue-800">Click the button below to complete your seller registration. You'll need to provide:</p>

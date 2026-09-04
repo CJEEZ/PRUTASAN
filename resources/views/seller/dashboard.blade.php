@@ -3,13 +3,9 @@
 @section('hideHeader')@endsection
 @section('content')
 <div class="flex w-full flex-col gap-6 p-3 sm:p-4 lg:flex-row lg:gap-6 lg:p-6" style="min-height:70vh;">
-    <aside class="hidden lg:block w-64 rounded bg-white p-4 shadow">
+    <aside class="block w-full shrink-0 rounded bg-white p-4 shadow lg:w-64">
         @include('seller._sidebar')
     </aside>
-
-    <div class="lg:hidden w-full">
-        @include('seller._mobile_nav')
-    </div>
 
     <div class="flex-1">
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

@@ -39,6 +39,7 @@
 
     @php
         $isAdminLayout = auth()->check() && auth()->user()->role === 'admin' && request()->is('admin*');
+        $isSellerApproval = request()->routeIs('seller.approval.*');
     @endphp
 
     @unless(View::hasSection('hideHeader'))
@@ -71,11 +72,29 @@
                 <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between">
                     <div class="flex items-center space-x-2">
                         <i class="fas fa-map-marker-alt text-sm"></i>
-                        <span>Fresh from Victoria, Oriental Mindoro</span>
+                        <span>Bagong Silang, Victoria, Oriental Mindoro</span>
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="{{ route('seller.start') }}" class="hover:text-emerald-200">Start Selling</a>
-                        <a href="#" class="hover:text-emerald-200">Help</a>
+
+                        <div class="relative">
+                            <button id="header-notification-toggle"
+                                    type="button"
+                                    class="relative rounded-full p-2 text-white/90 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/60"
+                                    aria-label="Notifications"
+                                    aria-expanded="false">
+                                <i class="fas fa-bell text-base"></i>
+                                <span id="header-notification-badge" class="absolute -right-1 -top-1 hidden min-w-[18px] rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-emerald-950"></span>
+                            </button>
+
+                            <div id="header-notification-panel" class="absolute right-0 top-12 z-50 hidden w-[min(92vw,22rem)] overflow-hidden rounded-xl border border-emerald-700 bg-white text-gray-800 shadow-2xl">
+                                <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                                    <h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
+                                    <button id="header-notification-mark-all" type="button" class="text-xs font-medium text-emerald-700 hover:text-emerald-800">Mark all read</button>
+                                </div>
+                                <div id="header-notification-list" class="max-h-80 overflow-y-auto"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,14 +108,14 @@
                         <!-- Left: Logo -->
                         <div class="flex-shrink-0 flex items-center h-full">
                             <a href="{{ route('catalog.index') }}" class="flex items-center gap-2 sm:gap-3 min-h-touch-target">
-                                <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="FruitExpress" class="h-14 w-auto object-contain sm:h-16">
+                                <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-14 w-auto object-contain sm:h-16">
                                 <span class="text-[11px] leading-tight text-gray-500 sm:text-xs">Oriental Mindoro</span>
                             </a>
                         </div>
 
 
                         <!-- Middle: Search Bar -->
-                        @unless(request()->routeIs('profile.*') || request()->routeIs('tracking.show') || request()->routeIs('checkout.*'))
+                        @unless($isSellerApproval || request()->routeIs('profile.*') || request()->routeIs('tracking.show') || request()->routeIs('checkout.*') || request()->routeIs('seller.messages'))
                             <div class="hidden md:flex flex-grow max-w-2xl mx-4">
                                 <form action="{{ route('catalog.index') }}" method="GET" class="relative w-full">
                                     <input type="search" name="search" placeholder="Search for fresh seasonal fruits..."
@@ -108,35 +127,43 @@
                                 </form>
                             </div>
                         @endunless
-
-
                         <!-- Right: Cart/Auth Icons -->
                         <div class="flex items-center gap-2 sm:gap-4 lg:gap-6 flex-shrink-0">
 
                             <!-- Profile Link (New) -->
                             @auth
-                                <a href="{{ route('profile.show') }}" class="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-emerald-600 transition duration-150 font-medium group">
-                                    <i class="fas fa-user-circle text-2xl text-gray-600 group-hover:text-emerald-600"></i>
-                                    <span class="text-base">Profile</span>
-                                </a>
+                                @unless($isSellerApproval)
+                                    <a href="{{ route('profile.show') }}" class="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-emerald-600 transition duration-150 font-medium group">
+                                        <i class="fas fa-user-circle text-2xl text-gray-600 group-hover:text-emerald-600"></i>
+                                        <span class="text-base">Profile</span>
+                                    </a>
+                                @endunless
                             @endauth
 
                             <!-- Cart Button -->
-                            <button id="open-cart-sidebar" class="relative p-2 min-h-touch-target min-w-touch-target text-gray-600 hover:text-emerald-600 transition duration-150 focus:outline-none rounded-full">
-                                <i class="fas fa-shopping-cart text-2xl"></i>
-                                <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-                                    {{ $cartService->getTotalQuantity() }}
-                                </span>
-                            </button>
+                            @unless($isSellerApproval)
+                                <button id="open-cart-sidebar" class="relative p-2 min-h-touch-target min-w-touch-target text-gray-600 hover:text-emerald-600 transition duration-150 focus:outline-none rounded-full">
+                                    <i class="fas fa-shopping-cart text-2xl"></i>
+                                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                        {{ $cartService->getTotalQuantity() }}
+                                    </span>
+                                </button>
+                            @endunless
 
                             <!-- Auth/Logout Button -->
                             @auth
-                                <form method="POST" action="{{ route('logout') }}" class="hidden sm:flex items-center space-x-1">
-                                    @csrf
-                                    <button type="submit" class="text-base text-gray-700 hover:text-emerald-600 transition duration-150 font-medium">
-                                        <i class="fas fa-sign-out-alt text-xl mr-1"></i>Logout
-                                    </button>
-                                </form>
+                                @if($isSellerApproval)
+                                    <a href="{{ route('home') }}" class="hidden sm:flex items-center space-x-1 text-base font-medium text-gray-700 transition duration-150 hover:text-emerald-600">
+                                        <i class="fas fa-home text-xl mr-1"></i>Back to Home
+                                    </a>
+                                @else
+                                    <form method="POST" action="{{ route('logout') }}" class="hidden sm:flex items-center space-x-1">
+                                        @csrf
+                                        <button type="submit" class="text-base text-gray-700 hover:text-emerald-600 transition duration-150 font-medium">
+                                            <i class="fas fa-sign-out-alt text-xl mr-1"></i>Logout
+                                        </button>
+                                    </form>
+                                @endif
                             @else
                                 <a href="{{ route('login') }}" class="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-emerald-600 transition duration-150 font-medium">
                                     <i class="fas fa-sign-in-alt text-2xl"></i>
@@ -157,7 +184,7 @@
             <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 p-4">
                 <div class="space-y-3">
 
-                    @unless(request()->routeIs('profile.*') || request()->routeIs('tracking.show') || request()->routeIs('checkout.*'))
+                    @unless($isSellerApproval || request()->routeIs('profile.*') || request()->routeIs('tracking.show') || request()->routeIs('checkout.*'))
                         <form action="{{ route('catalog.index') }}" method="GET" class="relative w-full">
                             <input type="search" name="search" placeholder="Search..."
                                    class="w-full py-2 pl-4 pr-12 border border-gray-300 rounded-lg text-sm"
@@ -169,21 +196,29 @@
                     @endunless
 
                     @auth
-                        <!-- Profile Link in Mobile Menu (New) -->
-                        <a href="{{ route('profile.show') }}" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-600">
-                            Profile
-                        </a>
+                        @unless($isSellerApproval)
+                            <!-- Profile Link in Mobile Menu (New) -->
+                            <a href="{{ route('profile.show') }}" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-600">
+                                Profile
+                            </a>
+                        @endunless
                         @if(auth()->user()->role === 'seller')
                             <a href="{{ route('seller.dashboard') }}" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-600">
                                 Seller Dashboard
                             </a>
                         @endif
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-red-50 hover:text-red-600">
-                                Logout ({{ Auth::user()->name }})
-                            </button>
-                        </form>
+                        @if($isSellerApproval)
+                            <a href="{{ route('home') }}" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-600">
+                                Back to Home
+                            </a>
+                        @else
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-red-50 hover:text-red-600">
+                                    Logout ({{ Auth::user()->name }})
+                                </button>
+                            </form>
+                        @endif
                     @else
                         <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-600">Login</a>
                         <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 mt-2 text-center">Register</a>
@@ -207,10 +242,12 @@
                 <i class="fas fa-home text-lg"></i>
                 <span>Home</span>
             </a>
-            <a href="{{ route('cart.show') }}" class="{{ request()->routeIs('cart.show') ? 'active' : '' }} flex-1">
-                <i class="fas fa-shopping-cart text-lg"></i>
-                <span>Cart</span>
-            </a>
+            @unless($isSellerApproval)
+                <a href="{{ route('cart.show') }}" class="{{ request()->routeIs('cart.show') ? 'active' : '' }} flex-1">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Cart</span>
+                </a>
+            @endunless
             @auth
                 @if(auth()->user()->role === 'seller')
                     <a href="{{ route('seller.dashboard') }}" class="{{ request()->routeIs('seller.dashboard') ? 'active' : '' }} flex-1">
@@ -218,10 +255,12 @@
                         <span>Seller</span>
                     </a>
                 @endif
-                <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }} flex-1">
-                    <i class="fas fa-user-circle text-lg"></i>
-                    <span>Account</span>
-                </a>
+                @unless($isSellerApproval)
+                    <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }} flex-1">
+                        <i class="fas fa-user-circle text-lg"></i>
+                        <span>Account</span>
+                    </a>
+                @endunless
             @else
                 <a href="{{ route('login') }}" class="flex-1">
                     <i class="fas fa-sign-in-alt text-lg"></i>
@@ -291,6 +330,107 @@
 
     @unless($isAdminLayout)
     <script>
+        const notificationToggle = document.getElementById('header-notification-toggle');
+        const notificationPanel = document.getElementById('header-notification-panel');
+        const notificationBadge = document.getElementById('header-notification-badge');
+        const notificationList = document.getElementById('header-notification-list');
+        const markAllReadButton = document.getElementById('header-notification-mark-all');
+
+        let headerNotifications = [];
+        let headerUnreadCount = 0;
+
+        function escapeNotificationText(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+            }[character]));
+        }
+
+        function renderNotifications() {
+            if (!notificationList || !notificationBadge) {
+                return;
+            }
+
+            const notifications = headerNotifications;
+            const unreadCount = headerUnreadCount;
+
+            notificationBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+            notificationBadge.classList.toggle('hidden', unreadCount === 0);
+
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<div class="px-4 py-8 text-center text-sm text-gray-500">All caught up. No new notifications.</div>';
+                return;
+            }
+
+            notificationList.innerHTML = notifications.map(notification => `
+                <button type="button" data-notification-id="${notification.id}" data-order-id="${notification.order_id || ''}" class="flex w-full items-start gap-3 border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 ${notification.read ? 'bg-white' : 'bg-emerald-50/60'}">
+                    <span class="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${notification.read ? 'bg-gray-100 text-gray-500' : 'bg-emerald-100 text-emerald-700'}">
+                        <i class="fas ${notification.read ? 'fa-check' : 'fa-bell'} text-xs"></i>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-sm font-semibold text-gray-900">${escapeNotificationText(notification.title)}</span>
+                        <span class="mt-1 block text-xs leading-5 text-gray-600">${escapeNotificationText(notification.message)}</span>
+                        <span class="mt-1 block text-[11px] text-gray-400">${escapeNotificationText(notification.time)}</span>
+                    </span>
+                    ${notification.read ? '' : '<span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-600"></span>'}
+                </button>
+            `).join('');
+
+            notificationList.querySelectorAll('[data-notification-id]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const item = headerNotifications.find(entry => String(entry.id) === button.dataset.notificationId);
+                    if (!item) return;
+                    fetch('/notifications/' + item.id + '/read', {
+                        method: 'PATCH',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' },
+                    }).then(() => loadNotifications());
+                    if (item.order_id) window.location.href = '/tracking/' + item.order_id;
+                });
+            });
+        }
+
+        function markAllNotificationsRead() {
+            fetch('/notifications/read-all', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' },
+            }).then(() => loadNotifications());
+        }
+
+        function loadNotifications() {
+            fetch('{{ route('notifications.index') }}', { headers: { 'Accept': 'application/json' } })
+                .then(response => response.ok ? response.json() : null)
+                .then(data => {
+                    if (!data) return;
+                    headerNotifications = data.notifications || [];
+                    headerUnreadCount = Number(data.unread_count || 0);
+                    renderNotifications();
+                })
+                .catch(() => {});
+        }
+
+        if (notificationToggle && notificationPanel) {
+            notificationToggle.addEventListener('click', () => {
+                const isHidden = notificationPanel.classList.toggle('hidden');
+                notificationToggle.setAttribute('aria-expanded', String(!isHidden));
+            });
+
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+
+                if (!notificationPanel.contains(target) && !notificationToggle.contains(target)) {
+                    notificationPanel.classList.add('hidden');
+                    notificationToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        if (markAllReadButton) {
+            markAllReadButton.addEventListener('click', markAllNotificationsRead);
+        }
+
+        renderNotifications();
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+
         // Load cart items from AJAX endpoint
         function loadCartItems() {
             fetch('/cart/api/items')

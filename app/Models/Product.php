@@ -65,4 +65,14 @@ class Product extends Model
     {
         return $this->belongsTo(\App\Models\User::class, 'seller_id');
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

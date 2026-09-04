@@ -7,6 +7,11 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Inquiry;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Schema;
 
@@ -93,5 +98,73 @@ class AdminDashboardController extends Controller
             'communicationInquiries',
             'communicationStats'
         ));
+    }
+
+    public function profile(): View
+    {
+        $user = Auth::user();
+
+        $platformStats = [
+            'customers' => User::where('role', '!=', 'admin')->count(),
+            'sellers' => User::where('role', 'seller')->count(),
+            'orders' => Order::count(),
+            'revenue' => (float) Order::sum('total'),
+            'messages' => Inquiry::count(),
+            'pending_sellers' => User::where('role', 'seller')->where(function ($query) {
+                $query->where('is_approved', false)->orWhereNull('is_approved');
+            })->count(),
+        ];
+
+        return view('admin.profile', compact('user', 'platformStats'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:1024'],
+        ]);
+
+        $user->fill($request->only('name', 'email'));
+
+        if ($request->hasFile('profile_photo')) {
+            $file = $request->file('profile_photo');
+            $filename = 'admin_profile_' . $user->id . '_' . Str::random(12) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public');
+
+            if ($path) {
+                if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+                    Storage::disk('public')->delete($user->profile_photo_path);
+                }
+
+                $user->profile_photo_path = $path;
+            }
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.profile')->with('success', 'Profile updated successfully!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('admin.profile')->with('success', 'Password updated successfully!');
     }
 }

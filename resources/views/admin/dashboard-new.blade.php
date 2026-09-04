@@ -11,7 +11,7 @@
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
                 <div class="flex items-center gap-4">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-                        <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="Ornos Farm" class="h-16 md:h-20 w-auto mr-3 object-contain">
+                        <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="Ornos Farm" class="h-16 md:h-20 w-auto mr-3 object-contain">
                     </a>
                     <div>
                         <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Seller Dashboard</h1>

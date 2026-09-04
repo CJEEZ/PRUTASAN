@@ -53,12 +53,13 @@
                     <input name="image_url" class="min-h-[40px] w-full rounded border border-gray-300 p-2" placeholder="https://example.com/image.jpg">
                 </div>
 
+                @if($isArindo)
                 <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
                     <h3 class="mb-3 font-semibold">Arindo Property Details</h3>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <label class="text-sm font-medium">Is Arindo Listing?</label>
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" name="is_arindo" value="1" class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                            <input type="checkbox" name="is_arindo" value="1" checked class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                             <span class="text-sm text-gray-700">Enable Arindo property fields</span>
                         </div>
                     </div>
@@ -105,6 +106,7 @@
                         <textarea name="land_photo_urls" rows="4" class="w-full border rounded p-2" placeholder="https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg"></textarea>
                     </div>
                 </div>
+                @endif
 
                 <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded">Add Product</button>
             </form>
