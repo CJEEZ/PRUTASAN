@@ -1,6 +1,7 @@
 FROM composer:2 AS composer-deps
 WORKDIR /app
 COPY . .
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
 
 FROM node:22-alpine AS frontend
