@@ -3,11 +3,13 @@
 @section('hideHeader')@endsection
 @section('content')
 <div class="flex w-full flex-col gap-6 p-3 sm:p-4 lg:flex-row lg:gap-6 lg:p-6" style="min-height:70vh;">
-    <aside class="block w-full shrink-0 rounded bg-white p-4 shadow lg:w-64">
+    <aside class="hidden w-full shrink-0 rounded bg-white p-4 shadow lg:block lg:w-64">
         @include('seller._sidebar')
     </aside>
 
     <div class="flex-1">
+        @include('seller._mobile_nav')
+
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-3">
                 <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="Ornos Farm" class="h-10 w-auto object-contain sm:h-12 lg:h-16">
