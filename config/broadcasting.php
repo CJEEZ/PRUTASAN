@@ -1,5 +1,12 @@
 <?php
 
+$broadcastConnection = env('BROADCAST_CONNECTION', 'log');
+$reverbConfigured = env('REVERB_APP_ID') && env('REVERB_APP_KEY') && env('REVERB_APP_SECRET');
+
+if ($broadcastConnection === 'reverb' && ! $reverbConfigured) {
+    $broadcastConnection = 'log';
+}
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -12,7 +19,7 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_CONNECTION', 'reverb'),
+    'default' => $broadcastConnection,
 
     /*
     |--------------------------------------------------------------------------
