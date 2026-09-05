@@ -1,6 +1,6 @@
 <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
     <a href="{{ route('products.show', $product) }}" class="group block flex-1">
-        <div class="relative h-32 sm:h-36 md:h-40 lg:h-44 overflow-hidden">
+        <div class="relative aspect-[4/3] overflow-hidden sm:h-36 sm:aspect-auto md:h-40 lg:h-44">
             <img src="{{ $product->image_url ?? 'https://placehold.co/600x400/FF7F00/ffffff?text=' . urlencode($product->name) }}"
                  alt="{{ $product->name }}"
                  onerror="this.onerror=null;this.src='https://placehold.co/600x400/FF7F00/ffffff?text=Image+Unavailable';"
@@ -18,18 +18,18 @@
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4">
-            <h3 class="line-clamp-2 text-sm font-semibold text-gray-800 sm:text-base">
+            <h3 class="product-card-title line-clamp-2 text-sm font-semibold text-gray-800 sm:text-base">
                 {{ $product->name }} ({{ $product->unit ?? '1kg' }})
             </h3>
 
             <!-- Rating and sales count -->
-            <div class="mt-2 flex items-center text-xs text-gray-500">
+            <div class="mt-2 flex min-w-0 items-center text-xs text-gray-500">
                 <span class="flex flex-row text-amber-400" dir="ltr" aria-label="{{ number_format($product->average_rating ?? 0, 1) }} out of 5 stars">
                     @for($star = 1; $star <= 5; $star++){!! $star <= round($product->average_rating ?? 0) ? '&#9733;' : '&#9734;' !!}@endfor
                 </span>
                 <span class="font-bold mr-2 ml-1">{{ number_format($product->average_rating ?? 0, 1) }}</span>
                 <span class="text-gray-400">|</span>
-                <span class="ml-2">{{ number_format($product->sold_quantity ?? 0, 0) }} sold</span>
+                <span class="ml-2 truncate">{{ number_format($product->sold_quantity ?? 0, 0) }} sold</span>
             </div>
 
             <!-- Price -->
@@ -54,7 +54,7 @@
         </div>
     </a>
 
-    <div class="mt-3">
+    <div class="mt-3 px-3 pb-3 sm:px-4 sm:pb-4">
         <!-- Call to Action -->
         @auth
             @if(isset($product->stock) && $product->stock > 0)

@@ -131,6 +131,28 @@ main {
   background: rgba(21, 128, 61, 0.08);
 }
 
+/* Keep two product cards readable on narrow phones and compact in landscape. */
+@media (max-width: 480px) {
+  .product-grid > * {
+    min-width: 0;
+  }
+
+  .product-grid .product-card-title {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .catalog-hero {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .catalog-hero img {
+    max-height: 10rem;
+  }
+}
+
 /* Scrollbar styling for better UX */
 ::-webkit-scrollbar {
   width: 8px;

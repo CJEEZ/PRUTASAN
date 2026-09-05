@@ -4,7 +4,7 @@
 <div class="pt-0">
 
     <!-- Hero Banner Section -->
-    <div class="bg-gradient-to-r from-emerald-700 via-emerald-600 to-orange-500 text-white py-8 sm:py-12 lg:py-16 mb-0 shadow-lg rounded-b-3xl">
+    <div class="catalog-hero bg-gradient-to-r from-emerald-700 via-emerald-600 to-orange-500 text-white py-8 sm:py-12 lg:py-16 mb-0 shadow-lg rounded-b-3xl">
         <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div class="md:w-1/2 space-y-4 text-center md:text-left">
                 <div class="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-sm font-medium backdrop-blur">
@@ -152,7 +152,7 @@
 
         <!-- Product Grid -->
         {{-- Increased grid columns to utilize the full width --}}
-        <div class="grid grid-cols-1 gap-4 border-t border-gray-200 pb-12 pt-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
+        <div class="product-grid grid grid-cols-2 gap-3 border-t border-gray-200 pb-12 pt-4 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
             @forelse ($products as $product)
                 @include('components.product_card', ['product' => $product])
             @empty
