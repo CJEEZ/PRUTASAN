@@ -5,16 +5,16 @@
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Customer Management</h1>
-            <p class="text-gray-600">View and manage all customers</p>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Customer Management</h1>
+            <p class="text-sm text-gray-600">View and manage all customers</p>
         </div>
 
         <!-- Search and Filter -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <form method="GET" action="{{ route('admin.customers.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
+            <form method="GET" action="{{ route('admin.customers.index') }}" class="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <!-- Search -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Search</label>
                     <input type="text" name="search" placeholder="Name, email, phone..."
                            value="{{ request('search') }}"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
@@ -22,7 +22,7 @@
 
                 <!-- Role Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Role</label>
                     <select name="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <option value="">All Roles</option>
                         <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Customer</option>
@@ -32,24 +32,24 @@
 
                 <!-- Date From -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">From Date</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                 </div>
 
                 <!-- Date To -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">To Date</label>
                     <input type="date" name="date_to" value="{{ request('date_to') }}"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                 </div>
 
                 <!-- Buttons -->
                 <div class="flex items-end gap-2">
-                    <button type="submit" class="w-full px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium">
+                    <button type="submit" class="w-full px-6 py-2 font-medium text-white transition bg-orange-600 rounded-lg hover:bg-orange-700">
                         Filter
                     </button>
-                    <a href="{{ route('admin.customers.index') }}" class="w-full px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium text-center">
+                    <a href="{{ route('admin.customers.index') }}" class="w-full px-6 py-2 font-medium text-center text-gray-700 transition bg-gray-300 rounded-lg hover:bg-gray-400">
                         Reset
                     </a>
                 </div>

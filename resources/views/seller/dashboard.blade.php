@@ -12,7 +12,7 @@
 
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-3">
-                <img src="{{ asset('A_Digital_Marketplace_for_Seasonal_Fruit_Distribution_for_Ornos_Farm-removebg-preview.png') }}" alt="Ornos Farm" class="h-10 w-auto object-contain sm:h-12 lg:h-16">
+                <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="Ornos Farm" class="h-10 w-auto object-contain sm:h-12 lg:h-16">
                 <div>
                     <h1 class="text-xl font-bold sm:text-2xl">Seller Dashboard</h1>
                     <p class="text-xs text-gray-600 sm:text-sm">Overview of sales and product inventory.</p>
@@ -79,18 +79,18 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="p-4 bg-white shadow rounded">
-                <div class="text-sm text-gray-500">Total Sales</div>
-                <div class="text-xl font-semibold">₱{{ number_format($totalSales, 2) }}</div>
+        <div class="seller-summary flex gap-2 overflow-x-auto pb-1 md:grid md:grid-cols-3 md:overflow-visible mb-6">
+            <div class="min-w-[130px] shrink-0 rounded-lg bg-white p-3 shadow md:min-w-0">
+                <div class="text-xs text-gray-500">Total Sales</div>
+                <div class="mt-1 text-lg font-semibold">₱{{ number_format($totalSales, 2) }}</div>
             </div>
-            <div class="p-4 bg-white shadow rounded">
-                <div class="text-sm text-gray-500">Total Orders</div>
-                <div class="text-xl font-semibold">{{ $ordersCount }}</div>
+            <div class="min-w-[130px] shrink-0 rounded-lg bg-white p-3 shadow md:min-w-0">
+                <div class="text-xs text-gray-500">Total Orders</div>
+                <div class="mt-1 text-lg font-semibold">{{ $ordersCount }}</div>
             </div>
-            <div class="p-4 bg-white shadow rounded">
-                <div class="text-sm text-gray-500">Products</div>
-                <div class="text-xl font-semibold">{{ $inventory->count() }}</div>
+            <div class="min-w-[130px] shrink-0 rounded-lg bg-white p-3 shadow md:min-w-0">
+                <div class="text-xs text-gray-500">Products</div>
+                <div class="mt-1 text-lg font-semibold">{{ $inventory->count() }}</div>
             </div>
         </div>
 

@@ -74,12 +74,6 @@ body {
   padding-bottom: max(env(safe-area-inset-bottom), 0px);
 }
 
-header {
-  padding-top: max(0.5rem, env(safe-area-inset-top));
-  padding-left: max(0.5rem, env(safe-area-inset-left));
-  padding-right: max(0.5rem, env(safe-area-inset-right));
-}
-
 /* Responsive images */
 img {
   max-width: 100%;
@@ -129,6 +123,25 @@ main {
 .mobile-bottom-nav a:hover {
   color: #15803d;
   background: rgba(21, 128, 61, 0.08);
+}
+
+.category-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(85, 132, 103, 0.45) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-scroll::-webkit-scrollbar-thumb {
+  background: rgba(85, 132, 103, 0.45);
+  border-radius: 999px;
 }
 
 /* Keep two product cards readable on narrow phones and compact in landscape. */

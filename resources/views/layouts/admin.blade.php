@@ -27,7 +27,24 @@
             color: #ffffff;
         }
         .stat-card {
-            @apply bg-white rounded-lg shadow p-6 hover:shadow-lg transition;
+            @apply bg-white rounded-lg shadow p-4 hover:shadow-lg transition;
+        }
+        .scrollbar-on-interaction {
+            scrollbar-width: none;
+        }
+        .scrollbar-on-interaction::-webkit-scrollbar {
+            height: 0;
+        }
+        .scrollbar-on-interaction:hover,
+        .scrollbar-on-interaction:focus-within,
+        .scrollbar-on-interaction:active {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .scrollbar-on-interaction:hover::-webkit-scrollbar,
+        .scrollbar-on-interaction:focus-within::-webkit-scrollbar,
+        .scrollbar-on-interaction:active::-webkit-scrollbar {
+            height: 6px;
         }
         .mobile-tab {
             display: flex;
@@ -205,16 +222,19 @@
         <main class="flex-1 overflow-auto bg-gray-50">
             <!-- Top Bar -->
             <div class="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur">
-                <div class="flex items-center justify-between px-4 py-3 sm:px-8 sm:py-4">
-                    <div class="min-w-0">
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-green-600">Operations Hub</p>
-                        <h2 class="text-lg font-bold text-gray-900 sm:text-2xl">@yield('page_title', 'Dashboard')</h2>
-                        <p class="mt-1 text-sm text-gray-600">@yield('page_subtitle', '')</p>
+                <div class="flex items-center justify-between gap-2 px-3 py-2 sm:px-6 sm:py-3">
+                    <div class="flex min-w-0 items-center gap-2">
+                        <button id="mobile-sidebar-toggle" class="order-first rounded-lg p-1.5 text-gray-600 hover:bg-gray-100 md:hidden">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-10 w-auto object-contain md:hidden">
+                        <div class="min-w-0">
+                            <p class="text-[9px] font-semibold uppercase tracking-[0.18em] text-green-600 sm:text-[10px]">Operations Hub</p>
+                            <h2 class="text-sm font-bold text-gray-900 sm:text-lg">@yield('page_title', 'Dashboard')</h2>
+                            <p class="mt-0.5 truncate text-[10px] text-gray-600 sm:mt-1 sm:text-xs">@yield('page_subtitle', '')</p>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2 sm:gap-4">
-                        <button id="mobile-sidebar-toggle" class="rounded-lg p-2 text-gray-600 hover:bg-gray-100 md:hidden">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
                         @php
                             $adminNotifications = \App\Models\Notification::where('user_id', Auth::id())
                                 ->latest()
@@ -224,7 +244,7 @@
                         @endphp
                         <div class="relative">
                             <button id="admin-notification-toggle" type="button" class="relative rounded-lg p-2 text-gray-600 transition hover:bg-gray-100" aria-label="Notifications" aria-expanded="false">
-                                <i class="fas fa-bell text-base"></i>
+                                <i class="fas fa-bell text-sm"></i>
                                 <span id="admin-notification-badge" class="absolute -right-1 -top-1 hidden min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
                                     {{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}
                                 </span>
@@ -264,9 +284,6 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
-                            <i class="fas fa-message"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -301,17 +318,17 @@
                 <i class="fas fa-chart-line text-base"></i>
                 <span>Home</span>
             </a>
-            <a href="{{ route('admin.orders.index') }}" class="mobile-tab {{ Route::is('admin.orders.*') ? 'active' : '' }}">
-                <i class="fas fa-shopping-cart text-base"></i>
-                <span>Orders</span>
+            <a href="{{ route('admin.messages') }}" class="mobile-tab {{ Route::is('admin.messages') ? 'active' : '' }}">
+                <i class="fas fa-comment-dots text-base"></i>
+                <span>Messages</span>
             </a>
             <a href="{{ route('admin.financial.index') }}" class="mobile-tab {{ Route::is('admin.financial.*') ? 'active' : '' }}">
                 <i class="fas fa-wallet text-base"></i>
-                <span>Payouts</span>
+                <span>Financial</span>
             </a>
-            <a href="{{ route('admin.messages') }}" class="mobile-tab {{ Route::is('admin.messages') ? 'active' : '' }}">
-                <i class="fas fa-comment-dots text-base"></i>
-                <span>Inbox</span>
+            <a href="{{ route('admin.settings.index') }}" class="mobile-tab {{ Route::is('admin.settings.*') ? 'active' : '' }}">
+                <i class="fas fa-cog text-base"></i>
+                <span>Settings</span>
             </a>
         </div>
     </nav>

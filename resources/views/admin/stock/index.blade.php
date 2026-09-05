@@ -5,53 +5,53 @@
 
 @section('content')
 <!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="stat-card">
+<div class="mb-6 grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
+    <div class="stat-card p-3 sm:p-4">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-500 text-sm font-medium">Total Products</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2">{{ $totalProducts }}</p>
+                    <p class="mt-1 text-xl font-bold text-gray-900 sm:text-2xl">{{ $totalProducts }}</p>
             </div>
-            <div class="bg-blue-100 p-4 rounded-lg">
-                <i class="fas fa-boxes text-2xl text-blue-600"></i>
+                <div class="rounded-lg bg-blue-100 p-2">
+                    <i class="fas fa-boxes text-lg text-blue-600"></i>
             </div>
         </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card p-3 sm:p-4">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-500 text-sm font-medium">Stock Value</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2">₱{{ number_format($totalStockValue, 0) }}</p>
+                <p class="mt-1 text-xl font-bold text-gray-900 sm:text-2xl">₱{{ number_format($totalStockValue, 0) }}</p>
             </div>
-            <div class="bg-green-100 p-4 rounded-lg">
-                <i class="fas fa-coins text-2xl text-green-600"></i>
+                <div class="rounded-lg bg-green-100 p-2">
+                    <i class="fas fa-coins text-lg text-green-600"></i>
             </div>
         </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card p-3 sm:p-4">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-500 text-sm font-medium">Low Stock</p>
-                <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $lowStock }}</p>
+                <p class="mt-1 text-xl font-bold text-yellow-600 sm:text-2xl">{{ $lowStock }}</p>
                 <p class="text-xs text-yellow-600 mt-1">≤ 5 items</p>
             </div>
-            <div class="bg-yellow-100 p-4 rounded-lg">
-                <i class="fas fa-exclamation-triangle text-2xl text-yellow-600"></i>
+                <div class="rounded-lg bg-yellow-100 p-2">
+                    <i class="fas fa-exclamation-triangle text-lg text-yellow-600"></i>
             </div>
         </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card p-3 sm:p-4">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-500 text-sm font-medium">Out of Stock</p>
-                <p class="text-3xl font-bold text-red-600 mt-2">{{ $outOfStock }}</p>
+                <p class="mt-1 text-xl font-bold text-red-600 sm:text-2xl">{{ $outOfStock }}</p>
                 <p class="text-xs text-red-600 mt-1">No stock</p>
             </div>
-            <div class="bg-red-100 p-4 rounded-lg">
-                <i class="fas fa-times-circle text-2xl text-red-600"></i>
+                <div class="rounded-lg bg-red-100 p-2">
+                    <i class="fas fa-times-circle text-lg text-red-600"></i>
             </div>
         </div>
     </div>

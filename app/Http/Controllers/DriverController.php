@@ -249,6 +249,10 @@ class DriverController extends Controller
 
         $application = $user->driverApplications()->latest()->first();
 
+        if ($application && $application->status === 'pending') {
+            return back()->with('success', 'Your driver application is pending admin review. You cannot upload new documents yet.');
+        }
+
         $validated = $request->validate([
             'license_serial_number' => ['required', 'string', 'max:100'],
             'license_photo' => [$application ? 'nullable' : 'required', 'image', 'mimes:jpeg,jpg,png', 'max:5120'],

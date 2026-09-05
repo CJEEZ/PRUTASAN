@@ -8,7 +8,7 @@
         @include('seller._sidebar')
     </aside>
 
-    <div class="flex-1 space-y-6">
+    <div class="flex-1 space-y-3">
         <div class="md:hidden">
             @include('seller._mobile_nav')
         </div>

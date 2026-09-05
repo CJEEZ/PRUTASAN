@@ -1,7 +1,7 @@
-<div class="mt-4 rounded-[1.5rem] border border-slate-800 bg-[#0f291f] p-4 shadow-2xl">
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+<div class="mt-3 rounded-[1.5rem] border border-slate-800 bg-[#0f291f] p-3 shadow-2xl sm:mt-4 sm:p-4">
+    <div class="mb-3 flex flex-col gap-2 md:mb-4 md:flex-row md:items-center md:justify-between">
         <div>
-            <h3 class="text-2xl font-semibold text-white">My Orders</h3>
+            <h3 class="text-xl font-semibold text-white sm:text-2xl">My Orders</h3>
             <p class="text-xs text-slate-400">Review your latest purchases and order status.</p>
         </div>
         <div class="flex items-center space-x-2 text-xs text-slate-300">
@@ -9,12 +9,12 @@
         </div>
     </div>
 
-    <div class="space-y-3">
+    <div class="space-y-2 sm:space-y-3">
         @forelse($orders as $order)
-            <div class="rounded-[1.25rem] border border-slate-800 bg-[#112e20] p-4 shadow-xl">
-                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="w-16 h-16 rounded-2xl bg-slate-800 overflow-hidden flex items-center justify-center">
+            <div class="rounded-[1.25rem] border border-slate-800 bg-[#112e20] p-3 shadow-xl sm:p-4">
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
+                    <div class="flex items-start gap-2">
+                        <div class="h-12 w-12 rounded-xl bg-slate-800 overflow-hidden flex items-center justify-center sm:h-16 sm:w-16 sm:rounded-2xl">
                             @if($order->items->first() && $order->items->first()->product && $order->items->first()->product->image_url)
                                 <img src="{{ $order->items->first()->product->image_url }}" alt="Product image for {{ $order->items->first()->product->name ?? 'order item' }}" class="object-cover w-full h-full" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FF7F00/ffffff?text=No+Image';">
                             @else
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <div class="flex flex-wrap items-center gap-2">
-                                <h4 class="font-semibold text-white text-base">Order #{{ $order->order_number }}</h4>
+                                <h4 class="font-semibold text-white text-sm sm:text-base">Order #{{ $order->order_number }}</h4>
                                 @php
                                     $customerStatusLabels = ['pending' => 'Pending', 'preparing' => 'Preparing', 'ready_for_pickup' => 'To Ship', 'cancelled' => 'Cancelled', 'in_transit' => 'In Transit', 'out_for_delivery' => 'Out for Delivery', 'to_receive' => 'To Receive', 'delivered' => 'Delivered'];
                                 @endphp
@@ -44,7 +44,7 @@
 
                     <div class="text-right">
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Total</p>
-                        <p class="text-2xl font-semibold text-white">₱{{ number_format($order->total ?? $order->total_amount ?? 0, 2) }}</p>
+                        <p class="text-xl font-semibold text-white sm:text-2xl">₱{{ number_format($order->total ?? $order->total_amount ?? 0, 2) }}</p>
                         @php
                             $trackableStatuses = \App\Models\Order::TRACKABLE_STATUSES;
                             $isToShip = in_array($order->status, ['preparing', 'ready_for_pickup', 'shipped','to_ship','packed','confirmed']);
@@ -52,7 +52,7 @@
                                 && ! in_array($order->status, ['preparing', 'packed', 'confirmed', 'delivered', 'completed'], true);
                             $actionButtonClass = 'inline-flex min-h-[30px] w-[88px] items-center justify-center rounded-full px-2.5 py-1.5 text-center text-[10px] font-semibold leading-tight';
                         @endphp
-                        <div class="mt-3 flex flex-wrap items-center justify-end gap-2">
+                        <div class="mt-2 flex flex-wrap items-center justify-end gap-1 sm:mt-3 sm:gap-2">
                             <button data-order-id="{{ $order->id }}" class="order-details {{ $actionButtonClass }} bg-[#0f291f] text-slate-100 border border-slate-700 hover:bg-[#16362b]">Details</button>
                             @if($canCustomerTrack)
                                 <a href="{{ route('tracking.show', $order) }}" class="{{ $actionButtonClass }} bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -86,9 +86,9 @@
                 </div>
             </div>
         @empty
-            <div class="text-center py-12 text-slate-400">
-                <i class="fas fa-shopping-bag text-5xl mb-4 text-slate-500"></i>
-                <p class="text-lg font-semibold text-white">No orders yet</p>
+            <div class="py-8 text-center text-slate-400 sm:py-12">
+                <i class="fas fa-shopping-bag mb-3 text-4xl text-slate-500 sm:mb-4 sm:text-5xl"></i>
+                <p class="text-base font-semibold text-white sm:text-lg">No orders yet</p>
                 <p class="mt-2 text-slate-400">Your recent purchases will appear here.</p>
             </div>
         @endforelse

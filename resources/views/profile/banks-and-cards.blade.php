@@ -1,12 +1,12 @@
 <!-- Banks & Cards Section -->
-<div id="banks-and-cards" class="mt-8">
+<div id="banks-and-cards" class="mt-4 sm:mt-8">
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h3 class="text-lg font-bold text-gray-800">Banks & Cards</h3>
-            <p class="text-sm text-gray-600 mt-1">Manage your payment methods</p>
+        <div class="px-3 py-2 border-b border-gray-200 bg-gray-50 sm:px-6 sm:py-4">
+            <h3 class="text-base font-bold text-gray-800 sm:text-lg">Banks & Cards</h3>
+            <p class="text-xs text-gray-600 mt-0.5 sm:mt-1 sm:text-sm">Manage your payment methods</p>
         </div>
 
-        <div class="p-6">
+        <div class="p-3 sm:p-6">
             <!-- Payment Methods List -->
             <div class="space-y-4">
                 @forelse($paymentMethods ?? [] as $method)
@@ -80,18 +80,18 @@
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-12">
-                        <i class="fas fa-credit-card text-5xl text-gray-300 mb-4"></i>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">No payment methods yet</h3>
-                        <p class="text-gray-600 mb-4">Add your first payment method to make checkout faster.</p>
+                    <div class="text-center py-6 sm:py-12">
+                        <i class="fas fa-credit-card text-3xl text-gray-300 mb-2 sm:text-5xl sm:mb-4"></i>
+                        <h3 class="text-base font-semibold text-gray-800 mb-1 sm:text-lg sm:mb-2">No payment methods yet</h3>
+                        <p class="text-sm text-gray-600 mb-3 sm:mb-4">Add your first payment method to make checkout faster.</p>
                     </div>
                 @endforelse
             </div>
 
             <!-- Add Payment Method Button at Bottom -->
-            <div class="mt-6 pt-4 border-t border-gray-200">
-                <button onclick="showAddPaymentMethodModal()" class="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-semibold hover:from-emerald-700 hover:to-green-700 transition shadow-md">
-                    <i class="fas fa-plus mr-2"></i>
+            <div class="mt-4 pt-3 border-t border-gray-200 sm:mt-6 sm:pt-4">
+                <button onclick="showAddPaymentMethodModal()" class="w-full inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-semibold hover:from-emerald-700 hover:to-green-700 transition shadow-md sm:px-6 sm:py-3">
+                    <i class="fas fa-plus mr-1.5 sm:mr-2"></i>
                     Add Payment Method
                 </button>
             </div>

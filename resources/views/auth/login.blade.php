@@ -4,17 +4,17 @@
 @endsection
 
 @section('content')
-<div class="min-h-screen flex flex-col items-center justify-center px-3 py-4 sm:p-4 login-page relative overflow-hidden" style="background-image: linear-gradient(rgba(255,255,255,0.58), rgba(255,255,255,0.66)), url('{{ asset('Screenshot 2026-07-04 102403.png') }}'); background-size: cover; background-position: center;">
-    <div class="text-center mb-6 sm:mb-8">
-        <div class="flex justify-center mb-4">
-            <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-28 md:h-40 lg:h-48 w-auto object-contain">
+<div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-3 py-3 sm:p-4 login-page" style="background-image: linear-gradient(rgba(255,255,255,0.58), rgba(255,255,255,0.66)), url('{{ asset('Screenshot 2026-07-04 102403.png') }}'); background-size: cover; background-position: center;">
+    <div class="mb-4 text-center sm:mb-6">
+        <div class="mb-2 flex justify-center sm:mb-3">
+            <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-28 w-auto object-contain sm:h-40 md:h-48">
         </div>
         <p class="text-gray-600 mt-1">Welcome back! Please login to continue</p>
     </div>
 
-    <div class="w-full max-w-sm bg-white p-4 sm:p-8 rounded-xl border-2 border-emerald-900 shadow-2xl transition duration-500 hover:shadow-2xl">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Login</h2>
-        <p class="text-sm text-gray-500 mb-6">Enter your credentials to access your account.</p>
+    <div class="w-full max-w-xs rounded-xl border-2 border-emerald-900 bg-white p-3 shadow-2xl transition duration-500 hover:shadow-2xl sm:max-w-sm sm:p-6">
+        <h2 class="mb-1 text-lg font-semibold text-gray-800 sm:text-xl">Login</h2>
+        <p class="mb-4 text-xs text-gray-500 sm:mb-5 sm:text-sm">Enter your credentials to access your account.</p>
 
         @if ($errors->any())
             <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -35,7 +35,7 @@
         <form method="POST" action="/login">
             @csrf
 
-            <div class="mb-4">
+            <div class="mb-3 sm:mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
                     placeholder="your@email.com"
@@ -45,7 +45,7 @@
                 @enderror
             </div>
 
-            <div class="mb-6">
+            <div class="mb-4 sm:mb-5">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div class="relative">
                     <input id="password" type="password" name="password" required autocomplete="current-password"
@@ -65,7 +65,7 @@
             </button>
         </form>
 
-        <div class="mt-6 mb-6 relative">
+        <div class="relative my-4 sm:my-5">
             <div class="absolute inset-0 flex items-center">
                 <div class="w-full border-t border-gray-300"></div>
             </div>
@@ -74,7 +74,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="mb-4 grid grid-cols-2 gap-2 sm:mb-5 sm:gap-3">
             <a href="{{ url('auth/google') }}" class="w-full min-h-touch-target py-2.5 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-150 flex items-center justify-center gap-2 shadow-sm">
                 <svg class="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -93,7 +93,7 @@
             </a>
         </div>
 
-        <div class="mt-6 text-center text-sm">
+        <div class="mt-4 text-center text-xs sm:mt-5 sm:text-sm">
             <p class="text-gray-500">
                 Don't have an account?
                 <a href="{{ route('register') }}" class="text-green-600 font-semibold hover:text-green-700 transition">Sign up</a>

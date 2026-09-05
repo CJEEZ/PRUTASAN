@@ -9,7 +9,7 @@
             @include('seller._sidebar')
         </aside>
 
-        <div class="flex-1 space-y-6">
+        <div class="flex-1 space-y-3">
             @if(session('success'))
                 <div class="rounded-3xl border border-emerald-600/30 bg-emerald-600/10 p-4 text-emerald-200">
                     {{ session('success') }}

@@ -42,40 +42,28 @@
         $isSellerApproval = request()->routeIs('seller.approval.*');
     @endphp
 
-    @unless(View::hasSection('hideHeader'))
-    <header class="sticky top-0 z-40 two-level-shadow bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        @if($isAdminLayout)
-            <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex items-center justify-between h-14">
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
-                        <span class="text-sm text-gray-600">Seller</span>
-                    </a>
-                    <div class="flex items-center space-x-5">
-                        <a href="{{ route('profile.show') }}" class="flex items-center text-gray-700 hover:text-emerald-600 transition">
-                            <i class="fas fa-user-circle text-2xl mr-1"></i>
-                            <span class="hidden sm:inline text-base">Profile</span>
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}" class="flex items-center">
-                            @csrf
-                            <button type="submit" class="flex items-center text-base text-gray-700 hover:text-red-600 transition font-semibold">
-                                <i class="fas fa-sign-out-alt text-xl mr-1"></i>
-                                <span class="hidden sm:inline">Logout</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        @else
-            <!-- Top Info Bar (Full Width) - hidden on seller routes -->
-            @unless(request()->routeIs('seller.*'))
-            <div class="bg-emerald-800 text-white text-base pt-6 pb-4 rounded-t-2xl hidden sm:block">
-                <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between">
-                    <div class="flex items-center space-x-2">
+    @unless(View::hasSection('hideHeader') || $isAdminLayout)
+    <header class="{{ request()->routeIs('profile.*') ? 'hidden sm:block' : '' }} sticky top-0 z-40 two-level-shadow bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        <!-- Top Info Bar (Full Width) - hidden on seller routes -->
+            @unless(request()->routeIs('seller.*') || request()->routeIs('profile.*'))
+            <div class="rounded-b-2xl bg-emerald-800 text-white text-[10px] py-1.5 sm:text-base sm:pt-6 sm:pb-4">
+                <div class="w-full mx-auto px-2 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+                    <div class="flex min-w-0 items-center space-x-2">
                         <i class="fas fa-map-marker-alt text-sm"></i>
-                        <span>Bagong Silang, Victoria, Oriental Mindoro</span>
+                        <span class="truncate">Bagong Silang, Victoria, Oriental Mindoro</span>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="{{ route('seller.start') }}" class="hover:text-emerald-200">Start Selling</a>
+                    <div class="flex shrink-0 items-center gap-1 sm:gap-4">
+                        @auth
+                            @if(auth()->user()->role === 'seller' && auth()->user()->computed_seller_status === 'approved')
+                                <a href="{{ route('seller.dashboard') }}" class="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 hover:text-emerald-200" title="Seller dashboard" aria-label="Seller dashboard">
+                                    <i class="fas fa-store text-sm"></i>
+                                </a>
+                            @else
+                                <a href="{{ route('seller.start') }}" class="hidden whitespace-nowrap hover:text-emerald-200 sm:inline">Start Selling</a>
+                            @endif
+                        @else
+                            <a href="{{ route('seller.start') }}" class="hidden whitespace-nowrap hover:text-emerald-200 sm:inline">Start Selling</a>
+                        @endauth
 
                         <div class="relative">
                             <button id="header-notification-toggle"
@@ -100,16 +88,17 @@
             </div>
             @endunless
 
+            @unless(request()->routeIs('profile.*') || request()->routeIs('seller.messages'))
             <!-- Main Navigation Bar (Full Width) -->
             <div class="bg-white">
-                <div class="w-full mx-auto px-3 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16 sm:h-20 items-center">
+                <div class="w-full mx-auto px-2 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-12 sm:h-20 items-center">
 
                         <!-- Left: Logo -->
                         <div class="flex-shrink-0 flex items-center h-full">
-                            <a href="{{ route('catalog.index') }}" class="flex items-center gap-2 sm:gap-3 min-h-touch-target">
-                                <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-14 w-auto object-contain sm:h-16">
-                                <span class="text-[11px] leading-tight text-gray-500 sm:text-xs">Oriental Mindoro</span>
+                            <a href="{{ route('catalog.index') }}" class="flex items-center gap-1.5 sm:gap-3 min-h-touch-target">
+                                <img src="{{ asset('ORNOSFARM_LOGOS.png') }}" alt="FruitExpress" class="h-12 w-auto object-contain sm:h-20">
+                                <span class="text-[10px] leading-tight text-gray-500 sm:text-xs">Oriental Mindoro</span>
                             </a>
                         </div>
 
@@ -128,14 +117,14 @@
                             </div>
                         @endunless
                         <!-- Right: Cart/Auth Icons -->
-                        <div class="flex items-center gap-2 sm:gap-4 lg:gap-6 flex-shrink-0">
+                        <div class="flex items-center gap-1 sm:gap-4 lg:gap-6 flex-shrink-0">
 
                             <!-- Profile Link (New) -->
                             @auth
                                 @unless($isSellerApproval)
                                     <a href="{{ route('profile.show') }}" class="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-emerald-600 transition duration-150 font-medium group">
                                         <i class="fas fa-user-circle text-2xl text-gray-600 group-hover:text-emerald-600"></i>
-                                        <span class="text-base">Profile</span>
+                                            <span class="text-base">Profile</span>
                                     </a>
                                 @endunless
                             @endauth
@@ -143,7 +132,7 @@
                             <!-- Cart Button -->
                             @unless($isSellerApproval)
                                 <button id="open-cart-sidebar" class="relative p-2 min-h-touch-target min-w-touch-target text-gray-600 hover:text-emerald-600 transition duration-150 focus:outline-none rounded-full">
-                                    <i class="fas fa-shopping-cart text-2xl"></i>
+                                    <i class="fas fa-shopping-cart text-lg"></i>
                                     <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                                         {{ $cartService->getTotalQuantity() }}
                                     </span>
@@ -171,10 +160,6 @@
                                 </a>
                             @endauth
 
-                            <!-- Mobile Menu Toggle -->
-                            <button id="mobile-menu-toggle" class="md:hidden p-2 min-h-touch-target min-w-touch-target text-gray-600 hover:text-emerald-600 transition duration-150 focus:outline-none rounded-md">
-                                <i class="fas fa-bars text-xl"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -225,7 +210,7 @@
                     @endauth
                 </div>
             </div>
-        @endif
+            @endunless
     </header>
     @endunless
 
@@ -237,35 +222,36 @@
 
     @unless($isAdminLayout)
     <nav class="mobile-bottom-nav md:hidden">
-        <div class="mx-auto flex max-w-5xl items-center justify-around px-2 py-2">
+        <div class="mx-auto flex max-w-5xl items-center justify-around px-1 py-1 sm:py-2">
             <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }} flex-1">
                 <i class="fas fa-home text-lg"></i>
                 <span>Home</span>
             </a>
-            @unless($isSellerApproval)
-                <a href="{{ route('cart.show') }}" class="{{ request()->routeIs('cart.show') ? 'active' : '' }} flex-1">
-                    <i class="fas fa-shopping-cart text-lg"></i>
-                    <span>Cart</span>
-                </a>
-            @endunless
+            <a href="{{ route('catalog.index') }}" class="{{ request()->routeIs('catalog.index') ? 'active' : '' }} flex-1">
+                <i class="fas fa-box-open text-lg"></i>
+                <span>Products</span>
+            </a>
             @auth
-                @if(auth()->user()->role === 'seller')
-                    <a href="{{ route('seller.dashboard') }}" class="{{ request()->routeIs('seller.dashboard') ? 'active' : '' }} flex-1">
-                        <i class="fas fa-store text-lg"></i>
-                        <span>Seller</span>
-                    </a>
-                @endif
+                @php
+                    $sellerMobileRoute = auth()->user()->role === 'seller' ? 'seller.dashboard' : 'seller.start';
+                @endphp
+                <a href="{{ route($sellerMobileRoute) }}" class="{{ request()->routeIs('seller.*') ? 'active' : '' }} flex-1">
+                    <i class="fas fa-store text-lg"></i>
+                    <span>Seller</span>
+                </a>
                 @unless($isSellerApproval)
                     <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }} flex-1">
                         <i class="fas fa-user-circle text-lg"></i>
                         <span>Account</span>
                     </a>
                 @endunless
-            @else
-                <a href="{{ route('login') }}" class="flex-1">
-                    <i class="fas fa-sign-in-alt text-lg"></i>
-                    <span>Login</span>
-                </a>
+                <form method="POST" action="{{ route('logout') }}" class="flex flex-1">
+                    @csrf
+                    <button type="submit" class="flex min-h-[44px] w-full flex-col items-center justify-center gap-0.5 rounded-full px-1 py-1 text-[10px] font-semibold text-gray-600 transition hover:bg-red-50 hover:text-red-600 sm:min-h-[52px] sm:py-2 sm:text-xs">
+                        <i class="fas fa-sign-out-alt text-base sm:text-lg"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
             @endauth
         </div>
     </nav>
@@ -273,7 +259,7 @@
 
     <!-- Footer remains unchanged -->
     <footer class="bg-gray-100 text-gray-600 mt-auto border-t border-gray-200">
-        <div class="w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="w-full mx-auto py-3 px-2 sm:py-8 sm:px-6 lg:px-8">
                 <div class="text-center text-sm text-gray-500 hidden">
                 &copy; {{ date('Y') }}. All rights reserved.
                 </div>
@@ -519,8 +505,6 @@
             const sidebar = document.getElementById('cart-sidebar');
             const openButton = document.getElementById('open-cart-sidebar');
             const closeButton = document.getElementById('close-cart-sidebar');
-            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
 
             if (openButton && sidebar) {
                 openButton.addEventListener('click', () => {
@@ -532,21 +516,6 @@
             if (closeButton && sidebar) {
                 closeButton.addEventListener('click', () => {
                     sidebar.classList.add('translate-x-full');
-                });
-            }
-
-            if (mobileMenuToggle && mobileMenu) {
-                mobileMenuToggle.addEventListener('click', () => {
-                    const isHidden = mobileMenu.classList.contains('hidden');
-                    mobileMenu.classList.toggle('hidden', !isHidden);
-                    mobileMenuToggle.setAttribute('aria-expanded', String(isHidden));
-                });
-
-                document.addEventListener('click', (event) => {
-                    if (!mobileMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
-                        mobileMenu.classList.add('hidden');
-                        mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                    }
                 });
             }
 

@@ -4,36 +4,32 @@
 <div class="pt-0">
 
     <!-- Hero Banner Section -->
-    <div class="catalog-hero bg-gradient-to-r from-emerald-700 via-emerald-600 to-orange-500 text-white py-8 sm:py-12 lg:py-16 mb-0 shadow-lg rounded-b-3xl">
-        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            <div class="md:w-1/2 space-y-4 text-center md:text-left">
-                <div class="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-sm font-medium backdrop-blur">
-                    <i class="fas fa-leaf mr-2"></i>
-                    Farm-fresh produce delivered daily
-                </div>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-snug">
+    <div class="catalog-hero rounded-2xl bg-orange-600 py-8 text-white shadow-lg sm:py-10 md:py-12">
+        <div class="mx-auto flex w-full flex-col items-center justify-between gap-6 px-4 sm:px-6 md:flex-row md:gap-8 lg:px-8">
+            <div class="space-y-4 text-center md:w-1/2 md:text-left">
+                <h1 class="text-3xl font-extrabold leading-snug tracking-tight sm:text-4xl md:text-5xl">
                     Fresh Seasonal Fruits
                 </h1>
-                <p class="text-base sm:text-lg font-light text-white/95 max-w-xl mx-auto md:mx-0">
-                    Delivered straight from the farms of Victoria, Oriental Mindoro. Experience the sweetest, freshest tropical fruits at your doorstep.
+                <p class="mx-auto max-w-lg text-base font-light text-white text-opacity-95 sm:text-lg md:mx-0">
+                    Delivered straight from the farms of Victoria, Oriental Mindoro. Experience the sweetest, freshest tropical fruits at your doorstep!
                 </p>
-                <div class="grid grid-cols-3 gap-3 pt-4 sm:flex sm:flex-wrap sm:justify-start sm:gap-4">
-                    <a href="{{ route('catalog.index', ['search' => $searchTerm ?: null]) }}" class="flex flex-col items-center justify-center min-h-[5.5rem] rounded-xl bg-white/15 p-2 text-center shadow-md backdrop-blur transition duration-200 hover:bg-white/25">
-                        <span class="text-2xl sm:text-3xl">🥭</span><span class="mt-1 text-[11px] font-semibold sm:text-xs">All Fruits</span>
+                <div class="flex flex-wrap justify-start gap-1 pt-2 sm:gap-2 sm:pt-3">
+                    <a href="{{ route('catalog.index', ['search' => $searchTerm ?: null]) }}" class="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-orange-500 p-1 text-center shadow-md transition duration-200 hover:bg-orange-700 sm:h-16 sm:w-16 md:h-20 md:w-20">
+                        <span class="text-lg sm:text-xl">🥭</span><span class="mt-0.5 text-[8px] font-medium sm:text-[9px]">All Fruits</span>
                     </a>
-                    <a href="{{ route('catalog.index', ['category' => 'tropical', 'search' => $searchTerm ?: null]) }}" class="flex flex-col items-center justify-center min-h-[5.5rem] rounded-xl bg-white/15 p-2 text-center shadow-md backdrop-blur transition duration-200 hover:bg-white/25">
-                        <span class="text-2xl sm:text-3xl">🍌</span><span class="mt-1 text-[11px] font-semibold sm:text-xs">Tropical</span>
+                    <a href="{{ route('catalog.index', ['category' => 'tropical', 'search' => $searchTerm ?: null]) }}" class="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-orange-500 p-1 text-center shadow-md transition duration-200 hover:bg-orange-700 sm:h-16 sm:w-16 md:h-20 md:w-20">
+                        <span class="text-lg sm:text-xl">🍌</span><span class="mt-0.5 text-[8px] font-medium sm:text-[9px]">Tropical</span>
                     </a>
-                    <a href="{{ route('catalog.index', ['seasonal' => 1, 'search' => $searchTerm ?: null]) }}" class="flex flex-col items-center justify-center min-h-[5.5rem] rounded-xl bg-white/15 p-2 text-center shadow-md backdrop-blur transition duration-200 hover:bg-white/25">
-                        <span class="text-2xl sm:text-3xl">🥥</span><span class="mt-1 text-[11px] font-semibold sm:text-xs">Seasonal</span>
+                    <a href="{{ route('catalog.index', ['seasonal' => 1, 'search' => $searchTerm ?: null]) }}" class="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-orange-500 p-1 text-center shadow-md transition duration-200 hover:bg-orange-700 sm:h-16 sm:w-16 md:h-20 md:w-20">
+                        <span class="text-lg sm:text-xl">🥥</span><span class="mt-0.5 text-[8px] font-medium sm:text-[9px]">Seasonal</span>
                     </a>
                 </div>
             </div>
-            <div class="md:w-1/2 relative">
-                <div class="overflow-hidden rounded-2xl border border-white/20 shadow-2xl">
+            <div class="relative mt-2 w-full md:mt-0 md:w-1/2 md:pl-8">
+                <div class="h-36 w-full overflow-hidden rounded-xl shadow-2xl sm:h-48 md:h-64">
                     <img src="{{ asset('Screenshot 2026-07-04 102403.png') }}"
                          alt="Fresh tropical fruits from the farm"
-                         class="h-56 w-full object-cover object-center sm:h-72 lg:h-80">
+                         class="h-full w-full object-cover object-center">
                 </div>
             </div>
         </div>
@@ -59,8 +55,8 @@
 
         <!-- Category & Filter Bar - CONSOLIDATED to ALL, TROPICAL, SEASONAL, EXOTIC -->
         <div class="flex flex-col gap-3 pt-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                <span class="mr-1 text-sm font-semibold text-gray-700">Filter By:</span>
+            <div class="category-scroll flex min-w-0 items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:pb-0">
+                <span class="mr-1 shrink-0 whitespace-nowrap text-sm font-semibold text-gray-700">Filter By:</span>
 
                 <!-- Helper array to construct URLs, ensuring the search term is always included if set -->
                 @php
@@ -82,7 +78,7 @@
                     $allParams = array_filter($baseParams);
                 @endphp
                 <a href="{{ route('catalog.index', $allParams) }}"
-                   class="rounded-lg px-3 py-2 text-sm font-medium transition duration-150
+                   class="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition duration-150
                           {{ $isAllActive ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-orange-100 hover:text-orange-700' }}">
                     ALL
                 </a>
@@ -106,7 +102,7 @@
                                      : 'bg-gray-200 text-gray-700 hover:bg-orange-100 hover:text-orange-700';
                 @endphp
                 <a href="{{ route('catalog.index', $tropicalParams) }}"
-                   class="rounded-lg px-3 py-2 text-sm font-medium transition duration-150 {{ $tropicalClass }}">
+                   class="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition duration-150 {{ $tropicalClass }}">
                     TROPICAL
                 </a>
 
@@ -120,7 +116,7 @@
                     ]));
                 @endphp
                 <a href="{{ route('catalog.index', $seasonalParams) }}"
-                   class="rounded-lg px-3 py-2 text-sm font-medium transition duration-150
+                   class="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition duration-150
                           {{ $isSeasonal ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-orange-100 hover:text-orange-700' }}">
                     SEASONAL
                 </a>
@@ -135,7 +131,7 @@
                     ]));
                 @endphp
                 <a href="{{ route('catalog.index', $exoticParams) }}"
-                   class="rounded-lg px-3 py-2 text-sm font-medium transition duration-150
+                   class="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition duration-150
                           {{ $isExotic ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-orange-100 hover:hover:text-orange-700' }}">
                     EXOTIC
                 </a>
@@ -152,7 +148,7 @@
 
         <!-- Product Grid -->
         {{-- Increased grid columns to utilize the full width --}}
-        <div class="product-grid grid grid-cols-2 gap-3 border-t border-gray-200 pb-12 pt-4 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
+        <div class="product-grid grid grid-cols-3 gap-1 border-t border-gray-200 pb-12 pt-4 sm:gap-2 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             @forelse ($products as $product)
                 @include('components.product_card', ['product' => $product])
             @empty

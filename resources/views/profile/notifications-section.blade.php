@@ -190,49 +190,49 @@
     ];
 @endphp
 
-<div id="messages" class="mt-4 overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
-    <div class="border-b border-emerald-100 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-400 p-3 text-white sm:p-4">
+<div id="messages" class="mt-3 overflow-hidden rounded-xl border border-emerald-100 bg-white shadow-sm">
+    <div class="border-b border-emerald-100 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-400 p-2.5 text-white sm:p-3">
         <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 @if($currentUser?->profile_photo_url)
                     <img src="{{ $currentUser->profile_photo_url }}" alt="{{ $customerName }}" class="h-12 w-12 rounded-full object-cover ring-2 ring-white/30">
                 @else
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-sm font-bold ring-2 ring-white/30">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-xs font-bold ring-2 ring-white/30">
                         {{ strtoupper(substr($customerName, 0, 2)) }}
                     </div>
                 @endif
                 <div>
                     <p class="text-xs uppercase tracking-[0.25em] text-emerald-100">Customer</p>
-                    <h3 class="text-lg font-bold">{{ $customerName }}</h3>
+                    <h3 class="text-base font-bold">{{ $customerName }}</h3>
                 </div>
             </div>
-            <span class="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">Online</span>
+            <span class="rounded-full bg-white/20 px-2 py-1 text-[10px] font-semibold">Online</span>
         </div>
 
 
 
-        <div class="relative mt-4">
-            <i class="fas fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-emerald-100"></i>
-            <input data-contact-search type="search" placeholder="Search users" class="w-full rounded-2xl border border-white/20 bg-white/10 py-3 pl-11 pr-4 text-sm text-white placeholder:text-emerald-100 focus:border-white/40 focus:outline-none">
+        <div data-contact-search-wrapper class="relative mt-3 md:block">
+            <i class="fas fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-emerald-100"></i>
+            <input data-contact-search type="search" placeholder="Search users" class="w-full rounded-xl border border-white/20 bg-white/10 py-2 pl-9 pr-3 text-sm text-white placeholder:text-emerald-100 focus:border-white/40 focus:outline-none">
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-[300px_minmax(0,1fr)]">
-        <aside class="border-b border-emerald-100 bg-slate-50 lg:border-b-0 lg:border-r">
-            <div class="flex items-center justify-between border-b border-emerald-100 px-4 py-3">
+    <div class="grid md:grid-cols-[240px_minmax(0,1fr)]">
+        <aside data-contact-index class="border-b border-emerald-100 bg-slate-50 md:block md:border-b-0 md:border-r">
+            <div class="flex items-center justify-between border-b border-emerald-100 px-3 py-2">
                 <h4 class="text-sm font-bold uppercase tracking-[0.25em] text-slate-500">Inbox</h4>
                 <span class="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">{{ count($contacts) }}</span>
             </div>
 
-            <div class="space-y-2 p-3">
+            <div class="space-y-1.5 p-2">
                 @if(count($contacts) > 0)
                     @foreach($contacts as $contact)
-                        <button type="button" data-contact-item data-user-id="{{ $contact['user_id'] ?? '' }}" data-name="{{ $contact['name'] }}" data-email="{{ $contact['email'] ?? '' }}" data-role="{{ $contact['role'] ?? 'Support' }}" data-score="{{ $contact['score'] ?? 0 }}" data-avatar-image="{{ $contact['profile_photo'] ?? '' }}" data-thread-messages='{{ json_encode($contact['messages'] ?? [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}' class="{{ $loop->first ? 'bg-white shadow-sm ring-1 ring-emerald-100' : 'bg-transparent hover:bg-white/80' }} flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition">
+                        <button type="button" data-contact-item data-user-id="{{ $contact['user_id'] ?? '' }}" data-name="{{ $contact['name'] }}" data-email="{{ $contact['email'] ?? '' }}" data-role="{{ $contact['role'] ?? 'Support' }}" data-score="{{ $contact['score'] ?? 0 }}" data-avatar-image="{{ $contact['profile_photo'] ?? '' }}" data-thread-messages='{{ json_encode($contact['messages'] ?? [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}' class="{{ $loop->first ? 'bg-white shadow-sm ring-1 ring-emerald-100' : 'bg-transparent hover:bg-white/80' }} flex min-h-[44px] w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left transition">
                             <div class="relative">
                                 @if(!empty($contact['profile_photo']))
                                     <img src="{{ $contact['profile_photo'] }}" alt="{{ $contact['name'] }}" class="h-11 w-11 rounded-full object-cover">
                                 @else
-                                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-400 text-xs font-bold text-white">
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-400 text-[9px] font-bold text-white">
                                         {{ $contact['avatar'] }}
                                     </div>
                                 @endif
@@ -240,18 +240,18 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="truncate text-sm font-semibold text-slate-800">{{ $contact['name'] }}</p>
+                                    <p class="truncate text-xs font-semibold text-slate-800">{{ $contact['name'] }}</p>
                                     @if($contact['badge'])
                                         <span class="rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $contact['badge'] }}</span>
                                     @endif
                                 </div>
-                                <p class="truncate text-xs text-slate-500">{{ $contact['role'] }}</p>
+                                <p class="truncate text-[10px] text-slate-500">{{ $contact['role'] }}</p>
                             </div>
                         </button>
                     @endforeach
                 @else
-                    <div class="flex min-h-[180px] flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-200 bg-slate-50 p-5 text-center text-slate-500">
-                        <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"><i class="fas fa-inbox"></i></div>
+                    <div class="flex min-h-[140px] flex-col items-center justify-center rounded-xl border border-dashed border-emerald-200 bg-slate-50 p-3 text-center text-slate-500">
+                        <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"><i class="fas fa-inbox"></i></div>
                         <p class="text-sm font-semibold text-slate-700">No conversations yet</p>
                         <p class="mt-1 text-xs text-slate-500">Your message inbox will show active conversations here.</p>
                     </div>
@@ -259,10 +259,13 @@
             </div>
         </aside>
 
-        <main class="flex min-h-[360px] flex-col bg-white">
-            <header class="flex items-center justify-between gap-3 border-b border-emerald-100 px-3 py-3 sm:px-4">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-slate-800 to-slate-600 text-xs font-bold text-white">
+        <main data-chat-panel class="hidden min-h-[300px] flex-col bg-white md:flex">
+            <header class="flex items-center justify-between gap-1.5 border-b border-emerald-100 px-2 py-2 sm:px-3">
+                <div class="flex min-w-0 items-center gap-1.5">
+                    <button type="button" data-mobile-messages-back class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 md:hidden" aria-label="Back to messages">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-slate-800 to-slate-600 text-[9px] font-bold text-white">
                         @if(!empty($activeContact['profile_photo']))
                             <img src="{{ $activeContact['profile_photo'] }}" alt="{{ $activeContact['name'] }}" class="h-full w-full object-cover">
                         @else
@@ -270,8 +273,8 @@
                         @endif
                     </div>
                     <div>
-                        <h4 id="customer-profile-name" data-testid="customer-profile-name" class="font-semibold text-slate-900">{{ $activeContact['name'] }}</h4>
-                        <p data-profile-status class="text-xs text-slate-500">{{ $activeContact['role'] }} • {{ $activeContact['status'] === 'online' ? 'Online now' : ($activeContact['away_minutes'] ? 'Away for ' . $activeContact['away_minutes'] . ' min' : 'Away') }}</p>
+                        <h4 id="customer-profile-name" data-testid="customer-profile-name" class="text-sm font-semibold text-slate-900">{{ $activeContact['name'] }}</h4>
+                        <p data-profile-status class="text-[10px] text-slate-500">{{ $activeContact['role'] }} • {{ $activeContact['status'] === 'online' ? 'Online now' : ($activeContact['away_minutes'] ? 'Away for ' . $activeContact['away_minutes'] . ' min' : 'Away') }}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 text-slate-500">
@@ -286,7 +289,7 @@
                         <form method="POST" action="{{ route('inquiries.conversations.destroy', $activeContact['conversation_id']) }}" data-delete-thread-form data-thread-key="{{ $profileThreadKey }}" data-legacy-thread-key="{{ $activeContact['user_id'] ?? $activeContact['email'] ?? $activeContact['name'] ?? '' }}" onsubmit="return confirm('Delete this conversation?');" class="inline-block">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-100" title="Delete conversation">
+                            <button type="submit" class="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-sm text-red-600 hover:bg-red-100" title="Delete conversation">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -294,12 +297,12 @@
                 </div>
             </header>
 
-            <div data-chat-thread class="h-[280px] min-h-[200px] max-h-[50vh] space-y-3 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_30%)] p-3 sm:h-[320px] sm:max-h-[55vh] sm:p-4">
+            <div data-chat-thread class="h-[220px] min-h-[160px] max-h-[45vh] space-y-2 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_30%)] p-2.5 sm:h-[260px] sm:max-h-[50vh] sm:p-3">
                 @foreach($activeContact['messages'] as $message)
                     <div class="flex {{ $message['direction'] === 'incoming' ? 'justify-start' : 'justify-end' }}">
-                        <div class="max-w-[80%] rounded-2xl px-4 py-3 shadow-sm {{ $message['direction'] === 'incoming' ? 'bg-slate-100 text-slate-700' : 'bg-emerald-600 text-white' }}">
-                            <p class="text-sm leading-6">{{ $message['text'] }}</p>
-                            <span class="mt-2 block text-[10px] font-medium {{ $message['direction'] === 'incoming' ? 'text-slate-500' : 'text-emerald-100' }}">{{ $message['time'] }}</span>
+                        <div class="max-w-[80%] rounded-xl px-3 py-2 shadow-sm {{ $message['direction'] === 'incoming' ? 'bg-slate-100 text-slate-700' : 'bg-emerald-600 text-white' }}">
+                            <p class="text-xs leading-5 sm:text-sm">{{ $message['text'] }}</p>
+                            <span class="mt-1 block text-[9px] font-medium {{ $message['direction'] === 'incoming' ? 'text-slate-500' : 'text-emerald-100' }}">{{ $message['time'] }}</span>
                         </div>
                     </div>
                 @endforeach
@@ -315,13 +318,13 @@
                 </div>
             </div>
 
-            <form data-chat-form data-recipient-id="{{ $activeContact['user_id'] ?? '' }}" data-recipient-name="{{ $activeContact['name'] }}" data-recipient-email="{{ $activeContact['email'] ?? '' }}" data-recipient-role="{{ $activeContact['role'] ?? 'Support' }}" method="POST" action="{{ route('inquiries.store') }}" class="border-t border-emerald-100 bg-white p-3 sm:p-4">
+            <form data-chat-form data-recipient-id="{{ $activeContact['user_id'] ?? '' }}" data-recipient-name="{{ $activeContact['name'] }}" data-recipient-email="{{ $activeContact['email'] ?? '' }}" data-recipient-role="{{ $activeContact['role'] ?? 'Support' }}" method="POST" action="{{ route('inquiries.store') }}" class="sticky bottom-0 z-10 mx-auto mt-auto w-full max-w-2xl border-t border-emerald-100 bg-white p-2.5 sm:p-3">
                 @csrf
                 <input type="hidden" name="recipient_id" value="{{ $activeContact['user_id'] ?? '' }}">
                 <input type="hidden" name="recipient_name" value="{{ $activeContact['name'] }}">
                 <input type="hidden" name="recipient_email" value="{{ $activeContact['email'] ?? '' }}">
                 <input type="hidden" name="recipient_role" value="{{ $activeContact['role'] ?? 'Support' }}">
-                <div class="flex items-end gap-3 rounded-2xl border border-emerald-100 bg-slate-50 p-2">
+                <div class="flex w-full items-end gap-2 rounded-xl border border-emerald-100 bg-slate-50 p-1.5">
                     <textarea name="message" data-chat-input rows="1" placeholder="Write a message..." class="max-h-32 min-h-[44px] flex-1 resize-none border-0 bg-transparent px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"></textarea>
                     <button type="submit" class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"><i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -339,9 +342,13 @@
         const input = document.querySelector('[data-chat-input]');
         const thread = document.querySelector('[data-chat-thread]');
         const typing = document.querySelector('[data-chat-typing]');
+        const contactIndex = document.querySelector('[data-contact-index]');
+        const chatPanel = document.querySelector('[data-chat-panel]');
+        const mobileMessagesBack = document.querySelector('[data-mobile-messages-back]');
+        const contactSearchWrapper = document.querySelector('[data-contact-search-wrapper]');
         const nameEl = document.querySelector('#customer-profile-name');
         const subtitleEl = document.querySelector('main header p');
-        const avatarEl = document.querySelector('main header .flex.h-11.w-11');
+        const avatarEl = document.querySelector('main header > div:first-child > div.flex');
         const storageKey = 'fruitexpress_message_threads';
         const threadCache = (() => {
             try {
@@ -466,6 +473,28 @@
                 }
                 avatarEl.innerHTML = '<span class="flex h-full w-full items-center justify-center text-xs font-bold">' + avatar + '</span>';
             }
+        };
+
+        const showMobileChat = function () {
+            if (!contactIndex || !chatPanel || !window.matchMedia('(max-width: 767px)').matches) {
+                return;
+            }
+
+            contactIndex.classList.add('hidden');
+            chatPanel.classList.remove('hidden');
+            chatPanel.classList.add('flex');
+            contactSearchWrapper?.classList.add('hidden');
+        };
+
+        const showMobileContacts = function () {
+            if (!contactIndex || !chatPanel || !window.matchMedia('(max-width: 767px)').matches) {
+                return;
+            }
+
+            chatPanel.classList.add('hidden');
+            chatPanel.classList.remove('flex');
+            contactIndex.classList.remove('hidden');
+            contactSearchWrapper?.classList.remove('hidden');
         };
 
         const refreshPresence = function (item) {
@@ -598,6 +627,7 @@
             renderThreadMessages(restoredMessages);
             applyActiveContactStyles();
             updateSelectedContactState();
+            showMobileChat();
         };
 
         const sortContactsByScore = function () {
@@ -690,6 +720,10 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', updateSelectedContactState);
+        }
+
+        if (mobileMessagesBack) {
+            mobileMessagesBack.addEventListener('click', showMobileContacts);
         }
 
         profileItems.forEach(function (item) {

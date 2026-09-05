@@ -3,49 +3,49 @@
 @section('hideHeader')@endsection
 
 @section('content')
-<div class="flex w-full flex-col gap-6 p-3 sm:p-4 lg:flex-row lg:gap-6 lg:p-6" style="min-height:70vh;">
+<div class="flex w-full min-w-0 flex-col gap-3 p-3 sm:gap-6 sm:p-4 lg:flex-row lg:p-6" style="min-height:70vh;">
     <aside class="hidden lg:block w-64 rounded bg-white p-4 shadow">
         @include('seller._sidebar')
     </aside>
-    <div class="lg:hidden w-full">
+    <div class="w-full min-w-0 lg:hidden">
         @include('seller._mobile_nav')
     </div>
-    <div class="flex-1">
-        <div class="rounded bg-white p-4 shadow sm:p-6">
-            <h2 class="mb-4 text-lg font-semibold sm:text-xl">Shipments</h2>
+    <div class="min-w-0 flex-1">
+        <div class="rounded bg-white p-3 shadow sm:p-6">
+            <h2 class="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Shipments</h2>
             @if(session('success'))
                 <div class="mb-4 rounded bg-green-100 p-2 text-sm text-green-800">{{ session('success') }}</div>
             @endif
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
+            <div class="w-full max-w-full overflow-x-auto overscroll-x-contain">
+                <table class="min-w-[560px] text-left text-[11px] sm:w-full sm:min-w-0 sm:text-sm">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Order #</th>
-                            <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Tracking #</th>
-                            <th class="hidden px-3 py-2 font-semibold text-gray-700 sm:table-cell sm:px-4 sm:py-3">Carrier</th>
-                            <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Status</th>
-                            <th class="hidden px-3 py-2 font-semibold text-gray-700 lg:table-cell lg:px-4 lg:py-3">Shipped At</th>
-                            <th class="px-3 py-2 font-semibold text-gray-700 sm:px-4 sm:py-3">Assigned rider</th>
+                            <th class="whitespace-nowrap px-1.5 py-1 text-[9px] font-semibold text-gray-700 sm:px-4 sm:py-3 sm:text-sm">Order #</th>
+                            <th class="whitespace-nowrap px-1.5 py-1 text-[9px] font-semibold text-gray-700 sm:px-4 sm:py-3 sm:text-sm">Tracking #</th>
+                            <th class="whitespace-nowrap px-1.5 py-1 text-[9px] font-semibold text-gray-700 sm:px-4 sm:py-3 sm:text-sm">Carrier</th>
+                            <th class="whitespace-nowrap px-1.5 py-1 text-[9px] font-semibold text-gray-700 sm:px-4 sm:py-3 sm:text-sm">Status</th>
+                            <th class="whitespace-nowrap px-1.5 py-1 text-[9px] font-semibold text-gray-700 sm:px-4 sm:py-3 sm:text-sm">Shipped At</th>
+                            <th class="whitespace-nowrap px-1.5 py-1 text-[9px] font-semibold text-gray-700 sm:px-4 sm:py-3 sm:text-sm">Assigned rider</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($shipments as $shipment)
                         <tr class="border-t transition hover:bg-gray-50">
-                            <td class="px-3 py-2 align-middle sm:px-4 sm:py-3">{{ $shipment->order->order_number ?? $shipment->order->id }}</td>
-                            <td class="px-3 py-2 align-middle text-xs sm:px-4 sm:py-3 sm:text-sm">{{ $shipment->tracking_number }}</td>
-                            <td class="hidden px-3 py-2 align-middle sm:table-cell sm:px-4 sm:py-3">{{ $shipment->carrier }}</td>
-                            <td class="px-3 py-2 align-middle sm:px-4 sm:py-3">
-                                <span class="inline-block rounded-full px-2 py-1 text-xs font-semibold
+                            <td class="whitespace-nowrap px-1.5 py-1 align-middle sm:px-4 sm:py-3">{{ $shipment->order->order_number ?? $shipment->order->id }}</td>
+                            <td class="whitespace-nowrap px-1.5 py-1 align-middle sm:px-4 sm:py-3">{{ $shipment->tracking_number }}</td>
+                            <td class="whitespace-nowrap px-1.5 py-1 align-middle sm:px-4 sm:py-3">{{ $shipment->carrier }}</td>
+                            <td class="whitespace-nowrap px-1.5 py-1 align-middle sm:px-4 sm:py-3">
+                                <span class="inline-block rounded-full px-1 py-0.5 text-[9px] font-semibold sm:px-2 sm:py-1 sm:text-xs
                                     @if($shipment->status === 'shipped') bg-blue-100 text-blue-800
                                     @elseif($shipment->status === 'delivered') bg-green-100 text-green-800
                                     @else bg-gray-100 text-gray-800 @endif">
                                     {{ $shipment->status === 'ready_for_pickup' ? 'To Ship' : ucfirst(str_replace('_', ' ', $shipment->status)) }}
                                 </span>
                             </td>
-                            <td class="hidden px-3 py-2 align-middle lg:table-cell lg:px-4 lg:py-3">{{ $shipment->shipped_at ? $shipment->shipped_at->format('Y-m-d') : '-' }}</td>
-                            <td class="px-3 py-2 align-middle sm:px-4 sm:py-3">
+                            <td class="whitespace-nowrap px-1.5 py-1 align-middle sm:px-4 sm:py-3">{{ $shipment->shipped_at ? $shipment->shipped_at->format('Y-m-d') : '-' }}</td>
+                            <td class="whitespace-nowrap px-1.5 py-1 align-middle sm:px-4 sm:py-3">
                                 @if($shipment->driver)
-                                    <span class="text-sm text-gray-700">{{ $shipment->driver->name }}</span>
+                                    <span class="text-[11px] text-gray-700 sm:text-sm">{{ $shipment->driver->name }}</span>
                                 @else
                                     <span class="text-xs text-gray-500">Waiting for rider</span>
                                 @endif
@@ -53,7 +53,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="py-4 text-center text-gray-500">No shipments found.</td>
+                            <td colspan="6" class="px-2 py-3 text-center text-xs text-gray-500 sm:py-4 sm:text-left sm:text-sm">No shipments found.</td>
                         </tr>
                         @endforelse
                     </tbody>

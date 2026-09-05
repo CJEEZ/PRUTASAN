@@ -79,7 +79,7 @@
                 'name' => $peer->name ?: 'Support team',
                 'email' => $peer->email ?: 'support@fruitexpress.com',
                 'role' => $peer->role ?: ucfirst($conversation->target_role ?: 'Support'),
-                'status' => $peer instanceof \App\Models\User && $peer->isOnline() ? 'online' : 'away',
+                'status' => 'active',
                 'away_minutes' => $peer instanceof \App\Models\User ? $peer->awayMinutes() : null,
                 'badge' => '',
                 'profile_photo' => $peer?->profile_photo_url ?: null,
@@ -130,7 +130,7 @@
             'name' => $profileUser->name,
             'email' => $profileUser->email,
             'role' => ucfirst($profileUser->role ?? 'member'),
-            'status' => $profileUser->isOnline() ? 'online' : 'away',
+            'status' => 'active',
             'away_minutes' => $profileUser->awayMinutes(),
             'badge' => '',
             'profile_photo' => $profileUser->profile_photo_url ?: null,
@@ -149,7 +149,7 @@
         'name' => 'Support team',
         'email' => 'support@fruitexpress.com',
         'role' => 'admin',
-        'status' => 'away',
+        'status' => 'active',
         'away_minutes' => null,
         'badge' => '',
         'profile_photo' => null,
@@ -179,14 +179,14 @@
 
 
 
-        <div class="relative mt-4">
+        <div data-contact-search-wrapper class="relative mt-4 md:block">
             <i class="fas fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-emerald-100"></i>
             <input data-contact-search type="search" placeholder="Search users" class="w-full rounded-2xl border border-white/20 bg-white/10 py-3 pl-11 pr-4 text-sm text-white placeholder:text-emerald-100 focus:border-white/30 focus:outline-none">
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-[300px_minmax(0,1fr)]">
-        <aside class="border-b border-gray-200 bg-gray-50 lg:border-b-0 lg:border-r">
+    <div class="grid md:grid-cols-[240px_minmax(0,1fr)]">
+        <aside data-contact-index class="border-b border-emerald-100 bg-emerald-50/40 md:border-b-0 md:border-r">
             <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
                 <h4 class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Inbox</h4>
                 <span class="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">{{ count($contacts) }}</span>
@@ -195,7 +195,7 @@
             <div class="space-y-2 p-3">
                 @if(count($contacts) > 0)
                     @foreach($contacts as $contact)
-                        <button type="button" data-contact-item data-user-id="{{ $contact['user_id'] ?? '' }}" data-name="{{ $contact['name'] }}" data-email="{{ $contact['email'] ?? '' }}" data-role="{{ $contact['role'] ?? 'Support' }}" data-presence="{{ $contact['status'] ?? 'away' }}" data-away-minutes="{{ $contact['away_minutes'] ?? '' }}" data-score="{{ $contact['score'] ?? 0 }}" data-avatar-image="{{ $contact['profile_photo'] ?? '' }}" data-thread-messages='{{ json_encode($contact['messages'] ?? [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}' class="{{ $loop->first ? 'bg-white shadow-sm ring-1 ring-emerald-100' : 'bg-transparent hover:bg-white/80' }} flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition">
+                        <button type="button" data-contact-item data-user-id="{{ $contact['user_id'] ?? '' }}" data-name="{{ $contact['name'] }}" data-email="{{ $contact['email'] ?? '' }}" data-role="{{ $contact['role'] ?? 'Support' }}" data-presence="{{ $contact['status'] ?? 'active' }}" data-away-minutes="{{ $contact['away_minutes'] ?? '' }}" data-score="{{ $contact['score'] ?? 0 }}" data-avatar-image="{{ $contact['profile_photo'] ?? '' }}" data-thread-messages='{{ json_encode($contact['messages'] ?? [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}' class="{{ $loop->first ? 'bg-white shadow-sm ring-1 ring-emerald-100' : 'bg-transparent hover:bg-white/80' }} flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition">
                             <div class="relative">
                                 @if(!empty($contact['profile_photo']))
                                     <img src="{{ $contact['profile_photo'] }}" alt="{{ $contact['name'] }}" class="h-11 w-11 rounded-full object-cover">
@@ -204,7 +204,7 @@
                                         {{ $contact['avatar'] }}
                                     </div>
                                 @endif
-                                <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white {{ $contact['status'] === 'online' ? 'bg-emerald-500' : 'bg-amber-400' }}"></span>
+                                <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center justify-between gap-2">
@@ -227,9 +227,12 @@
             </div>
         </aside>
 
-        <main class="flex min-h-[520px] flex-col bg-white">
-            <header class="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-4 sm:px-5">
-                <div class="flex items-center gap-3">
+        <main data-chat-panel class="hidden min-h-[360px] flex-col bg-white md:flex">
+            <header class="flex items-center justify-between gap-2 border-b border-emerald-100 px-3 py-3 sm:px-4">
+                <div class="flex min-w-0 items-center gap-2">
+                    <button type="button" data-mobile-messages-back class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 md:hidden" aria-label="Back to messages">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                     <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-xs font-bold text-white">
                         @if(!empty($activeContact['profile_photo']))
                             <img src="{{ $activeContact['profile_photo'] }}" alt="{{ $activeContact['name'] }}" class="h-full w-full object-cover">
@@ -239,7 +242,7 @@
                     </div>
                     <div>
                         <h4 id="admin-profile-name" data-testid="admin-profile-name" class="font-semibold text-slate-900">{{ $activeContact['name'] }}</h4>
-                        <p data-profile-status class="text-xs text-slate-500">{{ $activeContact['role'] }} • {{ $activeContact['status'] === 'online' ? 'Online now' : ($activeContact['away_minutes'] ? 'Away for ' . $activeContact['away_minutes'] . ' min' : 'Away') }}</p>
+                        <p data-profile-status class="text-xs text-slate-500">{{ $activeContact['role'] }} • Active • {{ ($activeContact['away_minutes'] ?? 0) >= 1440 ? floor(($activeContact['away_minutes'] ?? 0) / 1440) . ' days' : max(0, (int) ($activeContact['away_minutes'] ?? 0)) . ' min' }}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 text-slate-500">
@@ -307,6 +310,10 @@
         const input = document.querySelector('[data-chat-input]');
         const thread = document.querySelector('[data-chat-thread]');
         const typing = document.querySelector('[data-chat-typing]');
+        const contactIndex = document.querySelector('[data-contact-index]');
+        const chatPanel = document.querySelector('[data-chat-panel]');
+        const mobileMessagesBack = document.querySelector('[data-mobile-messages-back]');
+        const contactSearchWrapper = document.querySelector('[data-contact-search-wrapper]');
         const nameEl = document.querySelector('#admin-profile-name');
         const subtitleEl = document.querySelector('main header p');
         const avatarEl = document.querySelector('main header .flex.h-11.w-11');
@@ -325,6 +332,22 @@
             } catch (error) {
                 // Ignore storage issues silently.
             }
+        };
+
+        const showMobileChat = function () {
+            if (!contactIndex || !chatPanel || !window.matchMedia('(max-width: 767px)').matches) return;
+            contactIndex.classList.add('hidden');
+            chatPanel.classList.remove('hidden');
+            chatPanel.classList.add('flex');
+            contactSearchWrapper?.classList.add('hidden');
+        };
+
+        const showMobileContacts = function () {
+            if (!contactIndex || !chatPanel || !window.matchMedia('(max-width: 767px)').matches) return;
+            chatPanel.classList.add('hidden');
+            chatPanel.classList.remove('flex');
+            contactIndex.classList.remove('hidden');
+            contactSearchWrapper?.classList.remove('hidden');
         };
 
         const pruneStaleThreadCache = function () {
@@ -420,12 +443,25 @@
             }).join('');
         };
 
+        const formatActiveDuration = function (minutes) {
+            const elapsedMinutes = Number(minutes);
+            if (!Number.isFinite(elapsedMinutes) || elapsedMinutes <= 0) {
+                return '0 min';
+            }
+
+            if (elapsedMinutes >= 1440) {
+                return Math.floor(elapsedMinutes / 1440) + ' days';
+            }
+
+            return Math.floor(elapsedMinutes) + ' min';
+        };
+
         const updateSelectedProfile = function (name, role, avatar, avatarImage, presence, awayMinutes) {
             if (nameEl) {
                 nameEl.textContent = name;
             }
             if (subtitleEl) {
-                subtitleEl.textContent = role + ' • ' + (presence === 'online' ? 'Online now' : (awayMinutes ? 'Away for ' + awayMinutes + ' min' : 'Away'));
+                subtitleEl.textContent = role + ' • Active • ' + formatActiveDuration(awayMinutes);
             }
             if (avatarEl) {
                 if (avatarImage) {
@@ -443,15 +479,15 @@
                 .then(function (response) { return response.ok ? response.json() : null; })
                 .then(function (presence) {
                     if (!presence) return;
-                    item.dataset.presence = presence.status;
+                    item.dataset.presence = 'active';
                     item.dataset.awayMinutes = presence.away_minutes || '';
                     const dot = item.querySelector('span.absolute');
                     if (dot) {
-                        dot.classList.toggle('bg-emerald-500', presence.status === 'online');
-                        dot.classList.toggle('bg-amber-400', presence.status !== 'online');
+                        dot.classList.remove('bg-amber-400');
+                        dot.classList.add('bg-emerald-500');
                     }
                     const status = document.querySelector('[data-profile-status]');
-                    if (status && item.classList.contains('ring-1')) status.textContent = item.dataset.role + ' • ' + (presence.status === 'online' ? 'Online now' : (presence.away_minutes ? 'Away for ' + presence.away_minutes + ' min' : 'Away'));
+                    if (status && item.classList.contains('ring-1')) status.textContent = item.dataset.role + ' • Active • ' + formatActiveDuration(presence.away_minutes);
                 }).catch(function () {});
         };
 
@@ -562,10 +598,11 @@
             if (recipientEmailInput) recipientEmailInput.value = email;
             if (recipientRoleInput) recipientRoleInput.value = role;
 
-            updateSelectedProfile(name, role, item.dataset.avatar || name.substring(0, 2).toUpperCase() || 'ST', avatarImage, item.dataset.presence || 'away', item.dataset.awayMinutes || '');
+            updateSelectedProfile(name, role, item.dataset.avatar || name.substring(0, 2).toUpperCase() || 'ST', avatarImage, item.dataset.presence || 'active', item.dataset.awayMinutes || '');
             renderThreadMessages(restoredMessages);
             applyActiveContactStyles();
             updateSelectedContactState();
+            showMobileChat();
         };
 
         const sortContactsByScore = function () {
@@ -673,6 +710,10 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', updateSelectedContactState);
+        }
+
+        if (mobileMessagesBack) {
+            mobileMessagesBack.addEventListener('click', showMobileContacts);
         }
 
         profileItems.forEach(function (item) {
