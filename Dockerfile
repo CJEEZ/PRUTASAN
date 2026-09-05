@@ -5,7 +5,7 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts
 COPY . .
 RUN rm -f bootstrap/cache/*.php
-RUN composer dump-autoload --no-dev --optimize --no-interaction --no-progress --no-scripts \
+RUN composer dump-autoload --no-dev --optimize --no-scripts \
     && php artisan package:discover --ansi
 
 FROM node:22-alpine AS frontend
