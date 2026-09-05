@@ -31,7 +31,8 @@ COPY . .
 COPY --from=composer-deps /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-RUN chown -R www-data:www-data storage bootstrap/cache
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80
 
