@@ -1,15 +1,19 @@
 FROM composer:2 AS composer-deps
 WORKDIR /app
-COPY . .
+COPY composer.json composer.lock ./
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
+RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts
+COPY . .
+RUN rm -f bootstrap/cache/*.php
+RUN composer dump-autoload --no-dev --optimize --no-interaction --no-progress --no-scripts \
+    && php artisan package:discover --ansi
 
 FROM node:22-alpine AS frontend
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
-COPY resources resources
 COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY resources ./resources
 RUN npm run build
 
 FROM php:8.2-apache
