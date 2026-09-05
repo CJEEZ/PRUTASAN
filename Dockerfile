@@ -19,7 +19,7 @@ FROM php:8.2-apache
 WORKDIR /var/www/html
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libicu-dev libpq-dev libzip-dev \
+    && apt-get install -y --no-install-recommends libicu-dev libonig-dev libpq-dev libzip-dev \
     && docker-php-ext-install intl mbstring pdo_pgsql zip \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
