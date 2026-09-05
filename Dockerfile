@@ -5,8 +5,7 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts
 COPY . .
 RUN rm -f bootstrap/cache/*.php
-RUN composer dump-autoload --no-dev --optimize --no-scripts \
-    && php artisan package:discover --ansi
+RUN composer dump-autoload --no-dev --optimize --no-scripts
 
 FROM node:22-alpine AS frontend
 WORKDIR /app
@@ -32,9 +31,8 @@ COPY . .
 COPY --from=composer-deps /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && php artisan optimize:clear
+RUN chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80
 
-CMD ["sh", "-c", "set -e; php artisan migrate --force; php artisan storage:link --force; exec apache2-foreground"]
+CMD ["sh", "-c", "set -e; php artisan package:discover --ansi; php artisan migrate --force; php artisan storage:link --force; exec apache2-foreground"]
