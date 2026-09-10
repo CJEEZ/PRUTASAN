@@ -2,7 +2,8 @@
 
 ## Prerequisites
 - GitHub account with your repository pushed
-- Render account (free at render.com)
+- Render account at render.com
+- A paid Render web service and PostgreSQL database, because free services do not provide durable application storage
 
 ## Deployment Steps
 
@@ -30,6 +31,7 @@ git commit -m "Initial commit for Render deployment"
    - **Name**: `prutexpres` (or your preferred name)
   - **Runtime**: Docker
   - **Dockerfile**: `./Dockerfile`
+  - **Plan**: Starter or another paid plan with a persistent disk
 
 ### 4. Set Environment Variables
 In Render dashboard, add these environment variables:
@@ -51,8 +53,13 @@ In Render dashboard, add these environment variables:
 
 ### 5. Add PostgreSQL Database
 1. In Render dashboard → "**+ New**" → "**PostgreSQL**"
-2. Create database (free plan available)
+2. Create a paid database, such as the `Basic-256MB` plan
 3. Render will auto-populate DB environment variables
+
+The `render.yaml` blueprint also creates a 1 GB persistent disk mounted at
+`/var/www/html/storage/app/public`. This keeps profile photos and product
+thumbnails across web-service deploys. Increase the disk size or use S3 if
+the application will store more than 1 GB.
 
 ### 6. Deploy
 - Click "**Create Web Service**"
@@ -98,11 +105,24 @@ php artisan migrate --force
 
 Instead of manual setup, Render can read `render.yaml` from your repo root for automatic configuration. This file is already created in your project.
 
+## Persistence and upgrades
+
+- Never delete and recreate `prutexpres-db` during a deploy. Upgrade the existing
+  database in Render if it is still on the free plan; changing the plan must
+  preserve that database.
+- Keep the same `APP_KEY` in Render. Changing it invalidates sessions and
+  encrypted cookies, although it does not delete account rows.
+- The database contains accounts, orders, products, and other application data.
+  The persistent disk contains uploaded files. Both resources must remain
+  attached to the same service/database for a redeploy to preserve data.
+- Before changing infrastructure, create a database backup from the Render
+  dashboard and verify it can be restored.
+
 ## Cost
-- **Free tier**: 0.1 vCPU, 512 MB RAM per service
-- **PostgreSQL**: 0.5 GB free storage
-- Sufficient for small-medium projects
-- Paid plans available if you scale
+
+The web service, persistent disk, and PostgreSQL database use paid Render
+resources. Their exact prices depend on the selected plans and current Render
+pricing.
 
 ## Next Steps
 1. Push your code to GitHub

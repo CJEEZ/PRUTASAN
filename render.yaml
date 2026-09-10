@@ -2,9 +2,13 @@ services:
   - type: web
     name: prutexpres
     runtime: docker
-    plan: free
+    plan: starter
     dockerfilePath: ./Dockerfile
     dockerContext: .
+    disk:
+      name: prutexpres-storage
+      mountPath: /var/www/html/storage/app/public
+      sizeGB: 1
     envVars:
       - key: APP_NAME
         value: PRUTEXPRES
@@ -14,6 +18,8 @@ services:
         value: "false"
       - key: APP_URL
         value: https://prutexpres.onrender.com
+      - key: APP_KEY
+        sync: false
       - key: SESSION_DRIVER
         value: cookie
       - key: CACHE_STORE
@@ -51,5 +57,5 @@ services:
 
 databases:
   - name: prutexpres-db
-    plan: free
+    plan: basic-256mb
     databaseName: prutexpres
