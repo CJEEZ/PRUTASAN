@@ -22,6 +22,11 @@ class EnsureAdminUser extends Command
             if ($admin->trashed()) {
                 $admin->restore();
                 $this->info('Canonical admin account restored.');
+            }
+
+            if (is_string($password) && strlen($password) >= 12 && ! Hash::check($password, $admin->password)) {
+                $admin->update(['password' => Hash::make($password)]);
+                $this->info('Canonical admin password synchronized.');
             } else {
                 $this->info('Canonical admin already exists.');
             }
