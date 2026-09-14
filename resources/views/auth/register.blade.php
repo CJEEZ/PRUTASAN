@@ -66,8 +66,13 @@
 
                     <div class="mb-2">
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input id="password" name="password" type="password" required autocomplete="new-password"
-                               class="mt-1 block w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                        <div class="relative mt-1">
+                            <input id="password" name="password" type="password" required autocomplete="new-password"
+                                   class="block w-full px-4 py-2 pr-12 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                            <button type="button" data-password-toggle="password" class="absolute inset-y-0 right-0 px-3 text-gray-500 hover:text-emerald-700" aria-label="Show password">
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
                         @error('password') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -75,8 +80,13 @@
 
                     <div class="mb-6">
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required
-                               class="mt-1 block w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                        <div class="relative mt-1">
+                            <input id="password_confirmation" name="password_confirmation" type="password" required
+                                   class="block w-full px-4 py-2 pr-12 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                            <button type="button" data-password-toggle="password_confirmation" class="absolute inset-y-0 right-0 px-3 text-gray-500 hover:text-emerald-700" aria-label="Show password confirmation">
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" id="submit-btn" class="w-full py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700">
@@ -95,6 +105,18 @@
             const roleInput = document.getElementById('role-input');
             const submitBtn = document.getElementById('submit-btn');
             const driverNote = document.getElementById('driver-note');
+
+            document.querySelectorAll('[data-password-toggle]').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const input = document.getElementById(toggle.dataset.passwordToggle);
+                    const icon = toggle.querySelector('i');
+                    const isHidden = input.type === 'password';
+                    input.type = isHidden ? 'text' : 'password';
+                    toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+                    icon.classList.toggle('fa-eye', !isHidden);
+                    icon.classList.toggle('fa-eye-slash', isHidden);
+                });
+            });
 
             function setRole(role){
                 roleInput.value = role;
