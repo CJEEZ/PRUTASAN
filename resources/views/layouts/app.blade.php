@@ -227,10 +227,12 @@
                 <i class="fas fa-home text-lg"></i>
                 <span>Home</span>
             </a>
-            <a href="{{ route('catalog.index') }}" class="{{ request()->routeIs('catalog.index') ? 'active' : '' }} flex-1">
-                <i class="fas fa-box-open text-lg"></i>
-                <span>Products</span>
-            </a>
+            @guest
+                <a href="{{ route('catalog.index') }}" class="{{ request()->routeIs('catalog.index') ? 'active' : '' }} flex-1">
+                    <i class="fas fa-box-open text-lg"></i>
+                    <span>Products</span>
+                </a>
+            @endguest
             @auth
                 @php
                     $sellerMobileRoute = auth()->user()->role === 'seller' ? 'seller.dashboard' : 'seller.start';
