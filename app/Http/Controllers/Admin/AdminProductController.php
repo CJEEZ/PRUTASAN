@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminProductController extends Controller
@@ -30,10 +32,18 @@ class AdminProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'nullable|string',
+            'image_url' => 'nullable|url|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'unit' => 'required|string',
             'stock' => 'required|integer|min:0',
         ]);
+
+        unset($validated['image']);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image_url'] = asset('storage/' . $path);
+        }
 
         Product::create($validated);
 
@@ -58,10 +68,19 @@ class AdminProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'nullable|string',
+            'image_url' => 'nullable|url|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'unit' => 'required|string',
             'stock' => 'required|integer|min:0',
         ]);
+
+        unset($validated['image']);
+
+        if ($request->hasFile('image')) {
+            $this->deleteStoredImage($product->image_url);
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image_url'] = asset('storage/' . $path);
+        }
 
         $product->update($validated);
 
@@ -70,7 +89,22 @@ class AdminProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        $this->deleteStoredImage($product->image_url);
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully!');
+    }
+
+    private function deleteStoredImage(?string $imageUrl): void
+    {
+        if (!$imageUrl) {
+            return;
+        }
+
+        $path = parse_url($imageUrl, PHP_URL_PATH);
+        if (!$path || !Str::startsWith($path, '/storage/')) {
+            return;
+        }
+
+        Storage::disk('public')->delete(Str::after($path, '/storage/'));
     }
 }

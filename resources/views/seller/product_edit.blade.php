@@ -13,7 +13,7 @@
     <div class="flex-1">
         <div class="bg-white rounded shadow p-6">
             <h2 class="text-xl font-semibold mb-4">Edit Product</h2>
-            <form method="POST" action="{{ route('seller.products.update', $product->id) }}">
+            <form method="POST" action="{{ route('seller.products.update', $product->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
                 <div class="mb-4">
@@ -46,13 +46,21 @@
                     <input name="unit" value="{{ old('unit', $product->unit) }}" class="w-full border rounded p-2" placeholder="e.g., kg, lb" required>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Image URL</label>
-                    <input name="image_url" value="{{ old('image_url', $product->image_url) }}" class="w-full border rounded p-2" placeholder="https://example.com/image.jpg">
-                    @if ($product->image_url)
-                        <div class="mt-3">
-                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-24 w-24 object-cover rounded-lg">
-                        </div>
-                    @endif
+                    <label for="image" class="block text-sm font-medium mb-1">Product Image</label>
+                    <div class="flex items-center gap-3">
+                        @if ($product->image_url)
+                            <img id="product-image-preview" src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-24 w-24 object-cover rounded-lg ring-2 ring-orange-200">
+                        @else
+                            <img id="product-image-preview" src="" alt="Product image preview" class="hidden h-24 w-24 object-cover rounded-lg ring-2 ring-orange-200">
+                        @endif
+                        <label for="image" class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-orange-600 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-700">
+                            <i class="fas fa-camera"></i> Replace image
+                        </label>
+                        <input name="image" id="image" type="file" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden">
+                    </div>
+                    <p id="product-image-name" class="mt-1 text-xs text-gray-500">JPG, PNG, or WEBP, maximum 2MB</p>
+                    <label for="image_url" class="mt-2 block text-xs font-medium text-gray-600">Or use an external image URL</label>
+                    <input name="image_url" id="image_url" type="url" value="{{ old('image_url', $product->image_url) }}" class="mt-1 w-full border rounded p-2" placeholder="https://example.com/image.jpg">
                 </div>
 
                 <div class="rounded-xl border border-gray-200 p-4 mb-4 bg-gray-50">
@@ -112,4 +120,14 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('image')?.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('product-image-preview').src = URL.createObjectURL(file);
+        document.getElementById('product-image-preview').classList.remove('hidden');
+        document.getElementById('product-image-name').textContent = file.name;
+    });
+</script>
 @endsection

@@ -1,11 +1,11 @@
 <!-- Payment Method Modal -->
 <div id="payment-method-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-lg max-w-md w-full border border-gray-200">
-        <div class="px-6 py-4 border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-green-50">
+    <div class="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-lg">
+        <div class="shrink-0 border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-green-50 px-6 py-4">
             <h3 class="text-lg font-bold text-emerald-700">Add Payment Method</h3>
         </div>
 
-        <form id="payment-method-form" method="POST" action="{{ route('payment-methods.store') }}" class="p-6 space-y-4">
+        <form id="payment-method-form" method="POST" action="{{ route('payment-methods.store') }}" class="min-h-0 overflow-y-auto p-6 space-y-4">
             @csrf
 
             <!-- Payment Type -->
@@ -138,7 +138,7 @@
             </div>
 
             <!-- Buttons -->
-            <div class="flex gap-3 pt-4">
+            <div class="sticky bottom-0 -mx-6 -mb-6 flex gap-3 border-t border-gray-200 bg-white/95 px-6 py-4 pt-4 backdrop-blur">
                 <button type="button" onclick="closePaymentMethodModal()" class="flex-1 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition active:scale-95">
                     Cancel
                 </button>

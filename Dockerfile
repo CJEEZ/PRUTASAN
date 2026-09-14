@@ -36,4 +36,4 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 80
 
-CMD ["sh", "-c", "set -e; php artisan package:discover --ansi; php artisan migrate --force; php artisan storage:link --force; exec apache2-foreground"]
+CMD ["sh", "-c", "set -e; php artisan package:discover --ansi; php artisan migrate --force; if [ \"$(php artisan tinker --execute='echo \\App\\Models\\Product::query()->count();')\" = \"0\" ]; then php artisan db:seed --class=ProductSeeder --force; fi; php artisan storage:link --force; exec apache2-foreground"]

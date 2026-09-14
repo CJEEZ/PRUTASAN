@@ -13,6 +13,21 @@
         </div>
 
         <div class="rounded bg-white p-3 shadow sm:p-6">
+            @if(session('success'))
+                <div class="mb-4 rounded-lg bg-green-100 p-3 text-sm text-green-800">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-800">{{ session('error') }}</div>
+            @endif
+            @if($errors->any())
+                <div class="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-800">
+                    <ul class="list-disc pl-5">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <h2 class="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Bank Accounts</h2>
             <p class="text-sm text-gray-600 sm:text-base">Link and manage your payout account.</p>
 
@@ -84,7 +99,9 @@
                                     @else
                                         <button type="button" onclick="setAsDefault({{ $method->id }})" class="text-xs font-medium text-orange-600 hover:text-orange-700">Set Default</button>
                                     @endif
-                                    <button type="button" onclick="deletePaymentMethod({{ $method->id }})" class="text-xs font-medium text-red-600 hover:text-red-700">Delete</button>
+                                    <button type="button" onclick="deletePaymentMethod({{ $method->id }})" aria-label="Delete payment method" title="Delete payment method" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-red-600 transition hover:bg-red-50 hover:text-red-700">
+                                        <i class="fas fa-trash-alt text-sm"></i>
+                                    </button>
                                 </div>
                             </div>
                         @endforeach

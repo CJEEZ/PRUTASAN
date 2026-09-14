@@ -453,7 +453,9 @@
                                             <span class="px-3 py-1 text-sm font-semibold">${item.quantity}</span>
                                             <button onclick="updateQty(${item.id}, ${item.quantity + 1})" class="px-2 py-1 text-gray-600 hover:bg-gray-200 font-bold">+</button>
                                         </div>
-                                        <button onclick="removeItem(${item.id})" class="ml-auto text-red-500 hover:text-red-700 font-bold">✕</button>
+                                        <button type="button" onclick="removeItem(${item.id})" aria-label="Remove ${item.name}" title="Remove item" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg text-red-500 transition hover:bg-red-50 hover:text-red-700">
+                                            <i class="fas fa-trash-alt text-sm"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="text-right">

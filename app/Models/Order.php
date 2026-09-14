@@ -20,6 +20,7 @@ class Order extends Model
         'payment_status',
         'gcash_reference',
         'payment_confirmed_at',
+        'paymongo_checkout_session_id',
         'full_name',
         'phone',
         'street_address',

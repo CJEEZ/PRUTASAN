@@ -195,9 +195,13 @@
             <div class="user-card relative mx-3 mt-6 mb-3 rounded-xl border border-green-700/60 bg-green-900/40 px-3 py-3 sm:mx-4 sm:px-4 sm:py-4">
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-400 text-sm font-bold text-green-900">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                        </div>
+                        @if(Auth::user()->profile_photo_path)
+                            <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}" class="h-8 w-8 rounded-full object-cover ring-2 ring-green-300">
+                        @else
+                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-400 text-sm font-bold text-green-900">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                        @endif
                         <div class="min-w-0">
                             <p class="truncate text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-green-200">Admin</p>
@@ -289,7 +293,7 @@
             </div>
 
             <!-- Page Content -->
-            <div class="p-3 pb-24 sm:p-8 sm:pb-8">
+            <div class="p-2 pb-20 sm:p-8 sm:pb-8">
                 @if ($errors->any())
                     <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
                         <h3 class="text-red-800 font-semibold mb-2">Errors:</h3>

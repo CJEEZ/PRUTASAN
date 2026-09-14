@@ -21,6 +21,7 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -40,6 +41,8 @@ Route::middleware(['auth', 'track.activity'])->get('/presence/{user}', function 
         'away_minutes' => $user->awayMinutes(),
     ]);
 })->name('presence.show');
+
+Route::post('/payments/paymongo/webhook', [PaymentController::class, 'payMongoWebhook'])->name('payment.paymongo.webhook');
 
 // --- Root Route: Dashboard Landing Page (Requires Login) - NOT for admins ---
 Route::middleware(['auth', 'prevent-admin', 'track.activity'])->group(function () {
@@ -139,6 +142,8 @@ Route::middleware(['auth', 'prevent-admin', 'track.activity'])->group(function (
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
     Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::post('/checkout/direct-buy/{product}', [CheckoutController::class, 'directBuy'])->name('checkout.direct-buy');
+    Route::get('/payments/paymongo/success/{order}', [PaymentController::class, 'payMongoSuccess'])->name('payment.paymongo.success');
+    Route::get('/payments/paymongo/cancel/{order}', [PaymentController::class, 'payMongoCancel'])->name('payment.paymongo.cancel');
 
     // --- User Profile Routes ---
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

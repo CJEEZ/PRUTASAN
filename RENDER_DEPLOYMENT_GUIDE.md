@@ -115,6 +115,8 @@ Instead of manual setup, Render can read `render.yaml` from your repo root for a
 - The database contains accounts, orders, products, and other application data.
   The persistent disk contains uploaded files. Both resources must remain
   attached to the same service/database for a redeploy to preserve data.
+- On a new empty database, the container seeds the initial product catalog once.
+  Existing products are left unchanged on later restarts.
 - Before changing infrastructure, create a database backup from the Render
   dashboard and verify it can be restored.
 

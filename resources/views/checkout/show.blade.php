@@ -66,7 +66,7 @@
                 <img src="https://www.thefastmode.com/media/k2/items/src/03160998318f697230a7e611fb0fa87d.jpg?t=20200629_013741" alt="GCash" class="h-10 w-14 object-contain rounded bg-white p-1 shadow-sm">
                 <div>
                     <div class="font-semibold text-gray-900">GCash</div>
-                    <div class="text-sm text-gray-600">Pay via GCash (Instant payment)</div>
+                    <div class="text-sm text-gray-600">You will enter your GCash number, name, and OTP securely on PayMongo.</div>
                 </div>
             </label>
         </fieldset>

@@ -25,6 +25,7 @@ class PaymentMethodController extends Controller
     {
         $data = $request->validated();
         $data['user_id'] = Auth::id();
+        $data['is_default'] = $request->boolean('is_default');
 
         // Handle card type fields
         if ($data['type'] === 'card' && isset($data['card_number'])) {

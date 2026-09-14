@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->validateCsrfTokens(except: ['logout']);
+        $middleware->validateCsrfTokens(except: ['logout', 'payments/paymongo/webhook']);
 
         $middleware->alias([
             'prevent-admin' => \App\Http\Middleware\PreventAdminAccessUserRoutes::class,

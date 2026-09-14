@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class StorePaymentMethodRequest extends FormRequest
 {
@@ -26,8 +27,18 @@ class StorePaymentMethodRequest extends FormRequest
                 'card_type' => ['required', Rule::in('gcash', 'maya', 'bdo')],
                 'card_holder_name' => 'required|string|max:255',
                 'card_number' => 'required|string|min:10|max:20',
-                'expiry_month' => ['required', 'string', 'regex:/^\d{2}$/'],
-                'expiry_year' => ['required', 'string', 'digits:4', 'min:' . date('Y')],
+                'expiry_month' => ['required', 'string', 'in:01,02,03,04,05,06,07,08,09,10,11,12'],
+                'expiry_year' => [
+                    'required',
+                    'integer',
+                    'digits:4',
+                    function ($attribute, $value, $fail) {
+                        $expiry = Carbon::create((int) $value, (int) $this->input('expiry_month'), 1)->endOfMonth();
+                        if ($expiry->isPast()) {
+                            $fail('Card has expired.');
+                        }
+                    },
+                ],
             ]);
         } elseif ($type === 'bank') {
             $rules = array_merge($rules, [
@@ -51,7 +62,7 @@ class StorePaymentMethodRequest extends FormRequest
             'card_number.min' => 'Account/Reference number must be at least 10 characters',
             'card_number.max' => 'Account/Reference number must not exceed 20 characters',
             'expiry_month.required' => 'Expiry month is required',
-            'expiry_month.regex' => 'Expiry month must be between 01 and 12',
+            'expiry_month.in' => 'Expiry month must be between 01 and 12',
             'expiry_year.required' => 'Expiry year is required',
             'expiry_year.digits' => 'Expiry year must be 4 digits',
             'expiry_year.min' => 'Card has expired',

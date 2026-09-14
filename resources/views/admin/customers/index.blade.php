@@ -10,20 +10,20 @@
         </div>
 
         <!-- Search and Filter -->
-        <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
-            <form method="GET" action="{{ route('admin.customers.index') }}" class="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div class="p-3 mb-6 bg-white rounded-lg shadow-md md:p-6">
+            <form method="GET" action="{{ route('admin.customers.index') }}" class="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-4">
                 <!-- Search -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-700">Search</label>
+                    <label class="block mb-1 text-xs font-medium text-gray-700 md:mb-2 md:text-sm">Search</label>
                     <input type="text" name="search" placeholder="Name, email, phone..."
                            value="{{ request('search') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                           class="w-full px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent md:px-4 md:py-2 md:text-base">
                 </div>
 
                 <!-- Role Filter -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-700">Role</label>
-                    <select name="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <label class="block mb-1 text-xs font-medium text-gray-700 md:mb-2 md:text-sm">Role</label>
+                    <select name="role" class="w-full px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent md:px-4 md:py-2 md:text-base">
                         <option value="">All Roles</option>
                         <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Customer</option>
                         <option value="seller" {{ request('role') == 'seller' ? 'selected' : '' }}>Seller</option>
@@ -32,24 +32,24 @@
 
                 <!-- Date From -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-700">From Date</label>
+                    <label class="block mb-1 text-xs font-medium text-gray-700 md:mb-2 md:text-sm">From Date</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                           class="w-full px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent md:px-4 md:py-2 md:text-base">
                 </div>
 
                 <!-- Date To -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-700">To Date</label>
+                    <label class="block mb-1 text-xs font-medium text-gray-700 md:mb-2 md:text-sm">To Date</label>
                     <input type="date" name="date_to" value="{{ request('date_to') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                           class="w-full px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent md:px-4 md:py-2 md:text-base">
                 </div>
 
                 <!-- Buttons -->
-                <div class="flex items-end gap-2">
-                    <button type="submit" class="w-full px-6 py-2 font-medium text-white transition bg-orange-600 rounded-lg hover:bg-orange-700">
+                <div class="flex items-end gap-1 col-span-2 md:col-span-1 md:gap-2">
+                    <button type="submit" class="flex-1 basis-0 min-w-0 h-7 px-2 py-1 text-xs font-medium text-center text-white transition bg-orange-600 rounded-lg hover:bg-orange-700 md:h-auto md:px-6 md:py-2 md:text-base">
                         Filter
                     </button>
-                    <a href="{{ route('admin.customers.index') }}" class="w-full px-6 py-2 font-medium text-center text-gray-700 transition bg-gray-300 rounded-lg hover:bg-gray-400">
+                    <a href="{{ route('admin.customers.index') }}" class="flex-1 basis-0 min-w-0 h-7 px-2 py-1 text-xs font-medium text-center text-gray-700 transition bg-gray-300 rounded-lg hover:bg-gray-400 md:h-auto md:px-6 md:py-2 md:text-base">
                         Reset
                     </a>
                 </div>

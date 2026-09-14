@@ -13,7 +13,7 @@
     <div class="flex-1">
         <div class="rounded bg-white p-4 shadow sm:p-6">
             <h2 class="mb-4 text-lg font-semibold sm:text-xl">Add Product</h2>
-            <form method="POST" action="{{ route('seller.products.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('seller.products.store') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div>
                     <label class="mb-1 block text-sm font-medium">Name *</label>
@@ -49,8 +49,17 @@
                     </div>
                 </div>
                 <div>
-                    <label class="mb-1 block text-sm font-medium">Image URL</label>
-                    <input name="image_url" class="min-h-[40px] w-full rounded border border-gray-300 p-2" placeholder="https://example.com/image.jpg">
+                    <label for="image" class="mb-1 block text-sm font-medium">Product Image</label>
+                    <div class="flex items-center gap-3">
+                        <img id="product-image-preview" src="" alt="Product image preview" class="hidden h-20 w-20 rounded-lg object-cover ring-2 ring-orange-200">
+                        <label for="image" class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-orange-600 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-700">
+                            <i class="fas fa-camera"></i> Choose image
+                        </label>
+                        <input name="image" id="image" type="file" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden">
+                    </div>
+                    <p id="product-image-name" class="mt-2 text-xs text-gray-500">JPG, PNG, or WEBP, maximum 2MB</p>
+                    <label for="image_url" class="mt-2 block text-xs font-medium text-gray-600">Or use an external image URL</label>
+                    <input name="image_url" id="image_url" type="url" value="{{ old('image_url') }}" class="mt-1 min-h-[40px] w-full rounded border border-gray-300 p-2" placeholder="https://example.com/image.jpg">
                 </div>
 
                 @if($isArindo)
@@ -113,4 +122,14 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('image')?.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('product-image-preview').src = URL.createObjectURL(file);
+        document.getElementById('product-image-preview').classList.remove('hidden');
+        document.getElementById('product-image-name').textContent = file.name;
+    });
+</script>
 @endsection

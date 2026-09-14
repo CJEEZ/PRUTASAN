@@ -38,6 +38,12 @@
                             <h3 class="mt-1 text-2xl font-bold text-gray-900">{{ $user->name }}</h3>
                             <p class="text-sm text-gray-600">{{ $user->email }}</p>
                         </div>
+                        <button type="button" aria-controls="profile-edit-form" aria-expanded="false" aria-label="Edit admin profile" title="Edit profile" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-500 transition hover:border-green-600 hover:text-green-600" data-profile-edit-toggle data-testid="admin-profile-edit-button">
+                            <i class="fas fa-pen text-sm"></i>
+                        </button>
+                        <button type="button" aria-controls="password-edit-form" aria-expanded="false" aria-label="Change admin password" title="Change password" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-500 transition hover:border-green-600 hover:text-green-600" data-password-edit-toggle data-testid="admin-password-edit-button">
+                            <i class="fas fa-lock text-sm"></i>
+                        </button>
                     </div>
 
                     <div class="flex flex-wrap gap-2">
@@ -55,28 +61,28 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-                    <div class="rounded-2xl bg-slate-50 p-4">
+                <div class="grid grid-cols-3 gap-2 md:gap-4">
+                    <div class="rounded-2xl bg-slate-50 p-2 md:p-4">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Customers</p>
                         <p class="mt-2 text-2xl font-bold text-gray-900">{{ $platformStats['customers'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-slate-50 p-4">
+                    <div class="rounded-2xl bg-slate-50 p-2 md:p-4">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Sellers</p>
                         <p class="mt-2 text-2xl font-bold text-gray-900">{{ $platformStats['sellers'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-slate-50 p-4">
+                    <div class="rounded-2xl bg-slate-50 p-2 md:p-4">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Orders</p>
                         <p class="mt-2 text-2xl font-bold text-gray-900">{{ $platformStats['orders'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-slate-50 p-4">
+                    <div class="rounded-2xl bg-slate-50 p-2 md:p-4">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Revenue</p>
                         <p class="mt-2 text-xl font-bold text-gray-900">₱{{ number_format($platformStats['revenue'], 2) }}</p>
                     </div>
-                    <div class="rounded-2xl bg-slate-50 p-4">
+                    <div class="rounded-2xl bg-slate-50 p-2 md:p-4">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Messages</p>
                         <p class="mt-2 text-2xl font-bold text-gray-900">{{ $platformStats['messages'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-slate-50 p-4">
+                    <div class="rounded-2xl bg-slate-50 p-2 md:p-4">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Pending Sellers</p>
                         <p class="mt-2 text-2xl font-bold text-gray-900">{{ $platformStats['pending_sellers'] }}</p>
                     </div>
@@ -125,16 +131,17 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div id="profile-edit" class="stat-card">
                 <h3 class="text-lg font-bold text-gray-900">Profile photo</h3>
-                <form method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data" class="mt-4 space-y-4">
+                <form id="profile-edit-form" method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data" class="mt-4 {{ $errors->any() ? '' : 'hidden' }} space-y-4">
                     @csrf
 
                     <div class="flex items-center gap-4">
                         @if($user->profile_photo_path)
-                            <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="{{ $user->name }}" class="h-16 w-16 rounded-full object-cover ring-2 ring-green-200">
+                            <img id="profile-photo-preview" src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="{{ $user->name }}" class="h-16 w-16 rounded-full object-cover ring-2 ring-green-200">
                         @else
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
+                            <img id="profile-photo-preview" src="" alt="Profile photo preview" class="hidden h-16 w-16 rounded-full object-cover ring-2 ring-green-200">
+                            <div id="profile-photo-placeholder" class="flex h-16 w-16 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                             </div>
                         @endif
@@ -144,7 +151,7 @@
                                 {{ $user->profile_photo_path ? 'Change photo' : 'Attach profile photo' }}
                             </label>
                             <input id="profile_photo" name="profile_photo" type="file" accept="image/jpeg,image/png,image/jpg" class="hidden">
-                            <p class="mt-2 text-xs text-gray-500">JPG or PNG, maximum 1MB</p>
+                            <p id="profile-photo-name" class="mt-2 text-xs text-gray-500">JPG or PNG, maximum 1MB</p>
                         </div>
                     </div>
 
@@ -167,7 +174,7 @@
 
             <div class="stat-card">
                 <h3 class="text-lg font-bold text-gray-900">Change password</h3>
-                <form method="POST" action="{{ route('admin.profile.change_password') }}" class="mt-4 space-y-4">
+                <form id="password-edit-form" method="POST" action="{{ route('admin.profile.change_password') }}" class="mt-4 {{ $errors->any() ? '' : 'hidden' }} space-y-4">
                     @csrf
 
                     <div>
@@ -194,4 +201,31 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('[data-profile-edit-toggle], [data-password-edit-toggle]').forEach(function (toggle) {
+        toggle.addEventListener('click', function () {
+            const form = document.getElementById(this.getAttribute('aria-controls'));
+            const isHidden = form.classList.toggle('hidden');
+
+            this.setAttribute('aria-expanded', String(!isHidden));
+        });
+    });
+
+    document.getElementById('profile_photo')?.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('profile-photo-preview');
+        const placeholder = document.getElementById('profile-photo-placeholder');
+        const fileName = document.getElementById('profile-photo-name');
+
+        if (!file || !file.type.startsWith('image/')) {
+            return;
+        }
+
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+        placeholder?.classList.add('hidden');
+        fileName.textContent = file.name;
+    });
+</script>
 @endsection

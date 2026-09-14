@@ -31,7 +31,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.products.update', $product->id) }}" class="space-y-4">
+                <form method="POST" action="{{ route('admin.products.update', $product->id) }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     @method('PUT')
 
@@ -83,15 +83,24 @@
                     </div>
 
                     <div>
-                        <label for="image_url" class="block text-xs font-medium text-gray-700 mb-1 sm:text-sm">Image URL</label>
-                        <input type="text" name="image_url" id="image_url" value="{{ old('image_url', $product->image_url) }}"
-                            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        <label for="image" class="block text-xs font-medium text-gray-700 mb-1 sm:text-sm">Product Image</label>
+                        <div class="flex items-center gap-3">
+                            @if ($product->image_url)
+                                <img id="product-image-preview" src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-16 w-16 object-cover rounded-lg ring-2 ring-orange-200">
+                            @else
+                                <img id="product-image-preview" src="" alt="Product image preview" class="hidden h-16 w-16 object-cover rounded-lg ring-2 ring-orange-200">
+                            @endif
+                            <label for="image" class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-700">
+                                <i class="fas fa-camera"></i>
+                                Replace image
+                            </label>
+                            <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden">
+                        </div>
+                        <p id="product-image-name" class="mt-1 text-xs text-gray-500">JPG, PNG, or WEBP, maximum 2MB</p>
+                        <label for="image_url" class="mt-2 block text-xs font-medium text-gray-600">Or use an external image URL</label>
+                        <input type="url" name="image_url" id="image_url" value="{{ old('image_url', $product->image_url) }}"
+                            class="mt-1 w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             placeholder="https://example.com/image.jpg">
-                        @if ($product->image_url)
-                            <div class="mt-2">
-                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-16 w-16 object-cover rounded-lg">
-                            </div>
-                        @endif
                     </div>
 
                     <div class="flex gap-2">
@@ -107,4 +116,14 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('image')?.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('product-image-preview').src = URL.createObjectURL(file);
+        document.getElementById('product-image-preview').classList.remove('hidden');
+        document.getElementById('product-image-name').textContent = file.name;
+    });
+</script>
 @endsection

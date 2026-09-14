@@ -13,6 +13,7 @@ use App\Models\OrderItem;
 use App\Models\User;
 use App\Models\Notification;
 use App\Services\CartService;
+use App\Services\PayMongoService;
 
 class CheckoutController extends Controller
 {
@@ -133,7 +134,7 @@ class CheckoutController extends Controller
         return redirect()->route('cart.show')->with('info', 'Checkout canceled. Your item was added to the cart.');
     }
 
-    public function process(Request $request)
+    public function process(Request $request, PayMongoService $payMongo)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -147,6 +148,10 @@ class CheckoutController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
             'payment_method' => 'required|in:cod,gcash',
         ]);
+
+        if ($validated['payment_method'] === 'gcash' && !config('services.paymongo.secret_key')) {
+            return redirect()->back()->withInput()->with('error', 'Online GCash payment is not configured yet. Please use COD or contact support.');
+        }
 
         $orderNumber = 'F2W-' . time();
 
@@ -262,6 +267,47 @@ class CheckoutController extends Controller
         } catch (\Throwable $e) {
             Log::error('Checkout failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Unable to place order: ' . $e->getMessage());
+        }
+
+        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+
+        if ($validated['payment_method'] === 'gcash') {
+            try {
+                $lineItems = $cartItems->map(function ($item): array {
+                    return [
+                        'currency' => 'PHP',
+                        'amount' => (int) round($item->product->price * 100),
+                        'name' => $item->product->name,
+                        'quantity' => (int) $item->quantity,
+                    ];
+                })->values()->all();
+                $lineItems[] = [
+                    'currency' => 'PHP',
+                    'amount' => (int) round($shipping * 100),
+                    'name' => 'Shipping',
+                    'quantity' => 1,
+                ];
+
+                $session = $payMongo->createCheckoutSession($order->id, $order->order_number, $lineItems);
+                $sessionId = $session['id'] ?? null;
+                $checkoutUrl = $session['attributes']['checkout_url'] ?? null;
+
+                if (!$sessionId || !$checkoutUrl) {
+                    throw new \RuntimeException('PayMongo did not return a checkout URL.');
+                }
+
+                $order->update(['paymongo_checkout_session_id' => $sessionId]);
+
+                if (! $directBuy && ! $directBuyProductId) {
+                    $this->cartService->clear();
+                }
+                Session::forget(['direct_buy_checkout', 'direct_buy_product_id', 'direct_buy_quantity']);
+
+                return redirect()->away($checkoutUrl);
+            } catch (\Throwable $e) {
+                Log::error('PayMongo checkout creation failed: ' . $e->getMessage());
+                return redirect()->route('profile.show')->with('error', 'Order created, but online payment could not start. Please try again from your order or contact support.');
+            }
         }
 
         if (! $directBuy && ! $directBuyProductId) {

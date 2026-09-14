@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Inquiry;
@@ -192,7 +194,8 @@ class SellerDashboardController extends Controller
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:categories,id'],
             'unit' => ['required', 'string'],
-            'image_url' => ['nullable', 'string'],
+            'image_url' => ['nullable', 'url', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'is_arindo' => ['nullable', 'boolean'],
             'loan_amount' => ['nullable', 'numeric', 'min:0'],
             'term_years' => ['nullable', 'integer', 'min:1'],
@@ -211,6 +214,12 @@ class SellerDashboardController extends Controller
             ->all();
 
         $data['land_photo_urls'] = $landPhotoUrls;
+        unset($data['image']);
+        if ($request->hasFile('image')) {
+            $this->deleteStoredProductImage($product->image_url);
+            $path = $request->file('image')->store('products', 'public');
+            $data['image_url'] = asset('storage/' . $path);
+        }
         $data['is_arindo'] = $request->has('is_arindo');
         if ($data['is_arindo'] && $product->arindo_status !== 'available_for_arindo') {
             $data['arindo_status'] = 'pending_verification';
@@ -229,8 +238,23 @@ class SellerDashboardController extends Controller
             abort(403);
         }
         $product = \App\Models\Product::where('seller_id', $user->id)->findOrFail($id);
+        $this->deleteStoredProductImage($product->image_url);
         $product->delete();
         return redirect()->route('seller.products')->with('success', 'Product deleted successfully!');
+    }
+
+    private function deleteStoredProductImage(?string $imageUrl): void
+    {
+        if (!$imageUrl) {
+            return;
+        }
+
+        $path = parse_url($imageUrl, PHP_URL_PATH);
+        if (!$path || !Str::startsWith($path, '/storage/')) {
+            return;
+        }
+
+        Storage::disk('public')->delete(Str::after($path, '/storage/'));
     }
     /**
      * Display seller dashboard with sales summary and inventory.
@@ -632,7 +656,8 @@ class SellerDashboardController extends Controller
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:categories,id'],
             'unit' => ['required', 'string'],
-            'image_url' => ['nullable', 'string'],
+            'image_url' => ['nullable', 'url', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
         if ($request->has('is_arindo')) {
@@ -656,6 +681,11 @@ class SellerDashboardController extends Controller
             ->all();
 
         $data['land_photo_urls'] = $landPhotoUrls;
+        unset($data['image']);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $data['image_url'] = asset('storage/' . $path);
+        }
         $data['seller_id'] = $user->id;
         $data['is_arindo'] = $request->has('is_arindo');
         $data['arindo_status'] = $data['is_arindo'] ? 'pending_verification' : 'available';
