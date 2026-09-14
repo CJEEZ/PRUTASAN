@@ -35,8 +35,8 @@ class EnsureAdminUser extends Command
         }
 
         if (! is_string($password) || strlen($password) < 12) {
-            $this->error('ADMIN_PASSWORD must be set and contain at least 12 characters.');
-            return self::FAILURE;
+            $this->warn('ADMIN_PASSWORD is missing or too short; skipping admin creation. Configure it in the hosting environment to create the canonical admin.');
+            return self::SUCCESS;
         }
 
         User::create([
