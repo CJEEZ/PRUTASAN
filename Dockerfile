@@ -26,6 +26,7 @@ RUN apt-get update \
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 COPY . .
 COPY --from=composer-deps /app/vendor ./vendor
@@ -36,4 +37,4 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 80
 
-CMD ["sh", "-c", "set -e; php artisan package:discover --ansi; php artisan migrate --force; php artisan admin:ensure; if [ \"$(php artisan tinker --execute='echo \\App\\Models\\Product::query()->count();')\" = \"0\" ]; then php artisan db:seed --class=ProductSeeder --force; fi; php artisan storage:link --force; exec apache2-foreground"]
+CMD ["sh", "-c", "set -e; mkdir -p storage/app/public/products storage/app/public/profile_photos storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache; chown -R www-data:www-data storage bootstrap/cache; php artisan package:discover --ansi; php artisan migrate --force; php artisan admin:ensure; if [ \"$(php artisan tinker --execute='echo \\App\\Models\\Product::query()->count();')\" = \"0\" ]; then php artisan db:seed --class=ProductSeeder --force; fi; php artisan storage:link --force; exec apache2-foreground"]
