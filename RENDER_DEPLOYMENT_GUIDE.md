@@ -76,6 +76,12 @@ the application will store more than 1 GB.
 ### Generate App Key
 Generate an application key privately with `php artisan key:generate --show`, then add it as the `APP_KEY` secret in Render. Never commit it to `render.yaml` or `.env`.
 
+### Configure Admin Access
+Set `ADMIN_PASSWORD` manually in the Render service environment before the first
+deploy. It must contain at least 12 characters. The startup command creates the
+canonical admin only when it is missing, and restores it if it was soft-deleted;
+it does not change existing admin, seller, customer, or driver passwords.
+
 ### Run Migrations
 ```bash
 # Via Render shell:

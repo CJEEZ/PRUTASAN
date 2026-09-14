@@ -16,10 +16,22 @@ class EnsureAdminUser extends Command
     {
         $email = env('ADMIN_EMAIL', 'admin@fruitexpress.com');
         $password = env('ADMIN_PASSWORD');
+        $admin = User::withTrashed()->where('email', $email)->first();
 
-        if (User::where('email', $email)->exists()) {
-            $this->info('Canonical admin already exists.');
+        if ($admin?->isAdmin()) {
+            if ($admin->trashed()) {
+                $admin->restore();
+                $this->info('Canonical admin account restored.');
+            } else {
+                $this->info('Canonical admin already exists.');
+            }
+
             return self::SUCCESS;
+        }
+
+        if ($admin) {
+            $this->error("Cannot create the admin account because {$email} belongs to a non-admin user.");
+            return self::FAILURE;
         }
 
         if (! is_string($password) || strlen($password) < 12) {
