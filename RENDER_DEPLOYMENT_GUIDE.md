@@ -39,6 +39,7 @@ In Render dashboard, add these environment variables:
 | Key | Value |
 |-----|-------|
 | `APP_KEY` | Generate from `php artisan key:generate` locally, copy output |
+| `ADMIN_PASSWORD` | A new secret password, at least 12 characters, used only if the canonical admin is missing |
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | `false` |
 | `APP_URL` | Your Render service URL, including `https://` |
@@ -112,6 +113,9 @@ Instead of manual setup, Render can read `render.yaml` from your repo root for a
   preserve that database.
 - Keep the same `APP_KEY` in Render. Changing it invalidates sessions and
   encrypted cookies, although it does not delete account rows.
+- Keep the same PostgreSQL database attached to the service. The deployment
+  creates the canonical admin only when that account is missing and never
+  deletes existing customer, seller, or admin accounts.
 - The database contains accounts, orders, products, and other application data.
   The persistent disk contains uploaded files. Both resources must remain
   attached to the same service/database for a redeploy to preserve data.
